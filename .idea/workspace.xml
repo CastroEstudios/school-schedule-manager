@@ -7,7 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e8ddd05-a24f-4377-a402-c5118633b06d" name="Changes" comment="&quot;Add encodings.xml&quot;" />
+    <list default="true" id="5e8ddd05-a24f-4377-a402-c5118633b06d" name="Changes" comment="&quot;Un poco de todo&quot;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -100,7 +100,7 @@
       <workItem from="1673084368443" duration="100000" />
       <workItem from="1673084519659" duration="1036000" />
       <workItem from="1673085649345" duration="182000" />
-      <workItem from="1673085841544" duration="17000" />
+      <workItem from="1673085841544" duration="278000" />
     </task>
     <task id="LOCAL-00001" summary="&quot;First commit&quot;">
       <created>1672691915180</created>
@@ -116,11 +116,29 @@
       <option name="project" value="LOCAL" />
       <updated>1672691967577</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="&quot;Un poco de todo&quot;">
+      <created>1673085969733</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1673085969733</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -129,7 +147,8 @@
     </ignored-roots>
     <MESSAGE value="&quot;First commit&quot;" />
     <MESSAGE value="&quot;Add encodings.xml&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Add encodings.xml&quot;" />
+    <MESSAGE value="&quot;Un poco de todo&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Un poco de todo&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
