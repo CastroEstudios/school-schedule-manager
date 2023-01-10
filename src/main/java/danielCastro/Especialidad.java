@@ -18,6 +18,9 @@ public class Especialidad implements Serializable {
     @Column(name = "Nombre")
     private String nombre;
 
+    public Especialidad() {
+    }
+
     public Especialidad(int idEspecialidad, String nombre) {
         this.idEspecialidad = idEspecialidad;
         this.nombre = nombre;
@@ -25,10 +28,6 @@ public class Especialidad implements Serializable {
 
     public int getIdEspecialidad() {
         return idEspecialidad;
-    }
-
-    public void setIdEspecialidad(int idEspecialidad) {
-        this.idEspecialidad = idEspecialidad;
     }
 
     public String getNombre() {

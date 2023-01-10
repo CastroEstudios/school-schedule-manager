@@ -10,3 +10,132 @@ CREATE TABLE Profesor ( [42001-214]
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "CREATE TABLE Profesor ([*]"; se esperaba "identifier"
 Syntax error in SQL statement "CREATE TABLE Profesor ([*]"; expected "identifier"; SQL statement:
 CREATE TABLE Profesor ( [42001-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table Ciclo (\000d\000a\0009idCiclo int primary key,\000d\000a\0009Nombre varchar(45) not null,\000d\000a\0009Nivel varchar(20) not null default 'Medio' \000d\000a\0009\0009check Nivel in ('Básico', 'Medio', 'Superior'),\000d\000a\0009Especialidad_idEspecialidad smallint not null,\000d\000a\0009foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)\000d\000a)\000d\000a\000d\000a[*]create table Curso (\000d\000a\0009idCurso int primary key,\000d\000a\0009Turno varchar(20) not null default 'Manana'\000d\000a\0009\0009check Turno in ('Manana', 'Tarde', 'Noche'),\000d\000a\0009Nivel tinyint not null,\000d\000a\0009Ciclo_idCiclo int not null,\000d\000a\0009foreign key (Ciclo_idCiclo) references Ciclo(idCiclo)\000d\000a)"; SQL statement:
+create table Ciclo (
+	idCiclo int primary key,
+	Nombre varchar(45) not null,
+	Nivel varchar(20) not null default 'Medio' 
+		check Nivel in ('Básico', 'Medio', 'Superior'),
+	Especialidad_idEspecialidad smallint not null,
+	foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)
+)
+
+create table Curso (
+	idCurso int primary key,
+	Turno varchar(20) not null default 'Manana'
+		check Turno in ('Manana', 'Tarde', 'Noche'),
+	Nivel tinyint not null,
+	Ciclo_idCiclo int not null,
+	foreign key (Ciclo_idCiclo) references Ciclo(idCiclo)
+) [42000-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CURSO" not found; SQL statement:
+create table Modulo_Curso (
+	Modulo_idModulo int not null,
+	Curso_idCurso int not null,
+	foreign key (Modulo_idModulo) references Modulo(idModulo),
+	foreign key (Curso_idCurso) references Curso(idCurso),
+	primary key(Curso_idCurso, Modulo_idModulo)
+) [42102-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CURSO" not found; SQL statement:
+create table Modulos_Profesor (
+	Profesor_idProfesor int not null,
+	Modulo_idModulo int not null,
+	Curso_idCurso int not null,
+	foreign key (Profesor_idProfesor) references Profesor(idProfesor),
+	foreign key (Modulo_idModulo) references Modulo(idModulo),
+	foreign key (Curso_idCurso) references Curso(idCurso),
+	primary key (Profesor_idProfesor, Modulo_idModulo, Curso_idCurso)
+) [42102-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "insert into Especialidad values (1, Ciencias [*]de la Información)"; expected "(, ., [, ::, AT, FORMAT, *, /, %, +, -, ||, NOT, IS, ILIKE, REGEXP, AND, OR, ,, )"; SQL statement:
+insert into Especialidad values (1, Ciencias de la Información) [42001-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CICLO" not found; SQL statement:
+insert into Ciclo values (1, 'Desarrollo de Software Multiplataforma', 'Superior', 1) [42102-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CURSO" not found; SQL statement:
+insert into Curso values (1, 'Manana', 2, 1) [42102-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MODULO_CURSO" not found; SQL statement:
+insert into Modulo_Curso values (1, 1) [42102-214]
+2023-01-10 10:31:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MODULOS_PROFESOR" not found; SQL statement:
+insert into Modulos_Profesor values (1, 1, 1) [42102-214]
+2023-01-10 10:36:34 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table Curso (\000d\000a\0009idCurso int primary key,\000d\000a\0009Turno varchar(20) [*]enum ('Manana', 'Tarde', 'Noche') default 'Manana' not null,\000d\000a\0009Nivel tinyint not null,\000d\000a\0009Ciclo_idCiclo int not null,\000d\000a\0009foreign key (Ciclo_idCiclo) references Ciclo(idCiclo)\000d\000a)"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, NULL, AS, DEFAULT, GENERATED, ON UPDATE, NOT NULL, NULL, AUTO_INCREMENT, DEFAULT ON NULL, NULL_TO_DEFAULT, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, NULL, CHECK, REFERENCES, AUTO_INCREMENT, ,, )"; SQL statement:
+create table Curso (
+	idCurso int primary key,
+	Turno varchar(20) enum ('Manana', 'Tarde', 'Noche') default 'Manana' not null,
+	Nivel tinyint not null,
+	Ciclo_idCiclo int not null,
+	foreign key (Ciclo_idCiclo) references Ciclo(idCiclo)
+) [42001-214]
+2023-01-10 11:19:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "delete [*]* from Especialidad"; expected "identifier"; SQL statement:
+delete * from Especialidad [42001-214]
+2023-01-10 11:20:05 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "delete [*]* from Especialidad where idEspecialidad = 1"; expected "identifier"; SQL statement:
+delete * from Especialidad where idEspecialidad = 1 [42001-214]
+2023-01-10 11:20:08 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "delete [*]* from Especialidad where idEspecialidad = 1"; expected "identifier"; SQL statement:
+delete * from Especialidad where idEspecialidad = 1 [42001-214]
+2023-01-10 11:23:33 database: flush
+org.h2.message.DbException: General error: "org.h2.mvstore.MVStoreException: The file is locked: F:/Anima/Documents/Clase/AED/Final_Project/danielCastro-finalProject/h2/bd/cesarManrique.mv.db [2.1.214/7]" [50000-214]
+	at org.h2.message.DbException.get(DbException.java:212)
+	at org.h2.message.DbException.convert(DbException.java:395)
+	at org.h2.mvstore.db.Store.lambda$new$0(Store.java:125)
+	at org.h2.mvstore.MVStore.handleException(MVStore.java:3318)
+	at org.h2.mvstore.MVStore.panic(MVStore.java:593)
+	at org.h2.mvstore.MVStore.<init>(MVStore.java:469)
+	at org.h2.mvstore.MVStore$Builder.open(MVStore.java:4082)
+	at org.h2.mvstore.db.Store.<init>(Store.java:136)
+	at org.h2.engine.Database.<init>(Database.java:324)
+	at org.h2.engine.Engine.openSession(Engine.java:92)
+	at org.h2.engine.Engine.openSession(Engine.java:222)
+	at org.h2.engine.Engine.createSession(Engine.java:201)
+	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:338)
+	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:122)
+	at org.h2.Driver.connect(Driver.java:59)
+	at org.hibernate.engine.jdbc.connections.internal.DriverConnectionCreator.makeConnection(DriverConnectionCreator.java:39)
+	at org.hibernate.engine.jdbc.connections.internal.BasicConnectionCreator.createConnection(BasicConnectionCreator.java:62)
+	at org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl$PooledConnections.addConnections(DriverManagerConnectionProviderImpl.java:457)
+	at org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl$PooledConnections.<init>(DriverManagerConnectionProviderImpl.java:323)
+	at org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl$PooledConnections.<init>(DriverManagerConnectionProviderImpl.java:297)
+	at org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl$PooledConnections$Builder.build(DriverManagerConnectionProviderImpl.java:501)
+	at org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl.buildPool(DriverManagerConnectionProviderImpl.java:101)
+	at org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl.configure(DriverManagerConnectionProviderImpl.java:76)
+	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.configureService(StandardServiceRegistryImpl.java:107)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:246)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:214)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.buildJdbcConnectionAccess(JdbcEnvironmentInitiator.java:146)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:66)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:35)
+	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:101)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:263)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:237)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:214)
+	at org.hibernate.id.factory.internal.DefaultIdentifierGeneratorFactory.injectServices(DefaultIdentifierGeneratorFactory.java:175)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.injectDependencies(AbstractServiceRegistryImpl.java:286)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:243)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:214)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:173)
+	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:127)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1460)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1494)
+	at org.hibernate.jpa.HibernatePersistenceProvider.createEntityManagerFactory(HibernatePersistenceProvider.java:56)
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:79)
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:54)
+	at danielCastro.Main.<clinit>(Main.java:9)
+Caused by: org.h2.jdbc.JdbcSQLNonTransientException: General error: "org.h2.mvstore.MVStoreException: The file is locked: F:/Anima/Documents/Clase/AED/Final_Project/danielCastro-finalProject/h2/bd/cesarManrique.mv.db [2.1.214/7]" [50000-214]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:554)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
+	... 45 more
+Caused by: org.h2.mvstore.MVStoreException: The file is locked: F:/Anima/Documents/Clase/AED/Final_Project/danielCastro-finalProject/h2/bd/cesarManrique.mv.db [2.1.214/7]
+	at org.h2.mvstore.DataUtils.newMVStoreException(DataUtils.java:1004)
+	at org.h2.mvstore.FileStore.open(FileStore.java:178)
+	at org.h2.mvstore.FileStore.open(FileStore.java:128)
+	at org.h2.mvstore.MVStore.<init>(MVStore.java:452)
+	... 39 more

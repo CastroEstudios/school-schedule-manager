@@ -8,8 +8,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5e8ddd05-a24f-4377-a402-c5118633b06d" name="Changes" comment="&quot;Un poco de todo&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/jpa-buddy.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jpa-buddy.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bdScript.txt" beforeDir="false" afterPath="$PROJECT_DIR$/bdScript.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/h2/bd/cesarManrique.mv.db" beforeDir="false" afterPath="$PROJECT_DIR$/h2/bd/cesarManrique.mv.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/h2/bd/cesarManrique.trace.db" beforeDir="false" afterPath="$PROJECT_DIR$/h2/bd/cesarManrique.trace.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/danielCastro/Especialidad.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/danielCastro/Especialidad.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/danielCastro/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/danielCastro/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +32,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JpbToolWindowState">
+    <option name="isToolWindowVisible" value="false" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -107,6 +117,9 @@
       <workItem from="1673086131424" duration="3756000" />
       <workItem from="1673092235093" duration="83000" />
       <workItem from="1673092327658" duration="99000" />
+      <workItem from="1673343502858" duration="349000" />
+      <workItem from="1673347226024" duration="3395000" />
+      <workItem from="1673360279884" duration="16000" />
     </task>
     <task id="LOCAL-00001" summary="&quot;First commit&quot;">
       <created>1672691915180</created>
@@ -136,7 +149,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673086163250</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="&quot;Un poco de todo&quot;">
+      <created>1673343674736</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1673343674736</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -166,10 +186,14 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="javax.persistence.PersistenceException" package="javax.persistence" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/danielCastro/Main.java</url>
-          <line>6</line>
-          <option name="timeStamp" value="1" />
+          <line>20</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
