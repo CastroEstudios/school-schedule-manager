@@ -1,0 +1,12 @@
+2023-01-09 15:10:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "CREATE TABLE Profesor ([*]"; se esperaba "identifier"
+Syntax error in SQL statement "CREATE TABLE Profesor ([*]"; expected "identifier"; SQL statement:
+CREATE TABLE Profesor ( [42001-214]
+2023-01-09 15:10:32 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "CREATE TABLE Profesor ([*]"; se esperaba "identifier"
+Syntax error in SQL statement "CREATE TABLE Profesor ([*]"; expected "identifier"; SQL statement:
+CREATE TABLE Profesor ( [42001-214]
+2023-01-09 15:10:40 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "CREATE TABLE Profesor ([*]"; se esperaba "identifier"
+Syntax error in SQL statement "CREATE TABLE Profesor ([*]"; expected "identifier"; SQL statement:
+CREATE TABLE Profesor ( [42001-214]
