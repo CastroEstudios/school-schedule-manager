@@ -14,6 +14,8 @@ public class Main {
         addEspecialidad(4, "Imagen y Sonido");
         addEspecialidad(5, "Informática y Comunicaciones");
         getAllEspecialidad();
+        addProfesor("Wilfredo", "Wilfredo", 2277, 26, 1);
+        getAllProfesor();
         emf.close();
     }
 
@@ -26,13 +28,13 @@ public class Main {
             Especialidad especialidad = new Especialidad(idEspecialidad, nombre);
             em.persist(especialidad);
             et.commit();
-        }catch (RollbackException re) {
-            System.out.println("Error en la transacción");
-            re.printStackTrace();
         }catch (ConstraintViolationException cve) {
             System.out.println("Violación de clave primaria o foreign key");
             System.out.println("Compruebe que los datos no se superpongan");
             cve.printStackTrace();
+        }catch (RollbackException re) {
+            System.out.println("Error en la transacción");
+            re.printStackTrace();
         }catch (Exception ex) {
             if(et != null) {
                 et.rollback();
@@ -53,6 +55,50 @@ public class Main {
                     especialidad.getIdEspecialidad() + " | " + especialidad.getNombre()));
         }catch (NoResultException nrex) {
             nrex.printStackTrace();
+        }finally {
+            em.close();
+        }
+    }
+    public static void addProfesor(String nombre, String apellidos, int antiguedad, int horasContratadas
+            , int idEspecialidad) {
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction et = null;
+        try {
+            et = em.getTransaction();
+            et.begin();
+            Profesor profesor = new Profesor(nombre, apellidos, antiguedad, horasContratadas
+            , idEspecialidad );
+            em.persist(profesor);
+            et.commit();
+        }catch (ConstraintViolationException cve) {
+            System.out.println("Violación de clave primaria o foreign key");
+            System.out.println("Compruebe que los datos no se superpongan");
+            cve.printStackTrace();
+        }catch (RollbackException re) {
+            System.out.println("Error en la transacción");
+            re.printStackTrace();
+        }catch (Exception ex) {
+            if(et != null) {
+                et.rollback();
+            }
+            ex.printStackTrace();
+        }finally {
+            em.close();
+        }
+    }
+    public static void getAllProfesor() {
+        EntityManager em = emf.createEntityManager();
+        String query = "SELECT p FROM danielCastro.Profesor p";
+        TypedQuery<Profesor> tq = em.createQuery(query, Profesor.class);
+        List<Profesor> listaProfesor;
+        try {
+            listaProfesor = tq.getResultList();
+            listaProfesor.forEach(profesor ->System.out.println(
+                    profesor.getIdEspecialidad() + " | " + profesor.getNombre() + " | " + profesor.getApellidos() + " | "
+                            + profesor.getAntiguedad() + " | " + profesor.getHorasContratadas()));
+        }catch (NoResultException nrex) {
+            nrex.printStackTrace();
+            System.out.println("No hay profesores");
         }finally {
             em.close();
         }

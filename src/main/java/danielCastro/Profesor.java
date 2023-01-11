@@ -19,12 +19,6 @@ public class Profesor implements Serializable {
     private String nombre;
     @Column(name = "Apellidos", nullable = false)
     private String apellidos;
-    @Column(name = "Telefono", nullable = false)
-    private String telefono;
-    @Column(name = "Email", nullable = false)
-    private String email;
-    @Column(name = "Direccion", nullable = false)
-    private String direccion;
     @Column(name = "Antiguedad", nullable = false)
     private int antiguedad;
     @Column(name = "Horas_Contratadas", nullable = false)
@@ -32,13 +26,12 @@ public class Profesor implements Serializable {
     @Column(name = "Especialidad_idEspecialidad", nullable = false)
     private int idEspecialidad;
 
-    public Profesor(String nombre, String apellidos, String telefono, String email,
-                    String direccion, int antiguedad, int horasContratadas, int idEspecialidad) {
+    public Profesor() {
+    }
+
+    public Profesor(String nombre, String apellidos, int antiguedad, int horasContratadas, int idEspecialidad) {
         this.nombre = nombre;
         this.apellidos = apellidos;
-        this.telefono = telefono;
-        this.email = email;
-        this.direccion = direccion;
         this.antiguedad = antiguedad;
         this.horasContratadas = horasContratadas;
         this.idEspecialidad = idEspecialidad;
@@ -58,30 +51,6 @@ public class Profesor implements Serializable {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
     }
 
     public int getAntiguedad() {
