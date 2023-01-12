@@ -1,4 +1,4 @@
-package danielCastro;
+package danielCastro.schoolschedule.dao;
 
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -13,15 +13,15 @@ public class Profesor implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "idProfesor", unique = true)
-    private int id;
+    @Column(name = "NIF", unique = true)
+    private int nif;
     @Column(name = "Nombre", nullable = false)
     private String nombre;
     @Column(name = "Apellidos", nullable = false)
     private String apellidos;
     @Column(name = "Antiguedad", nullable = false)
     private int antiguedad;
-    @Column(name = "Horas_Contratadas", nullable = false)
+    @Column(name = "HORASCONTRATADAS", nullable = false)
     private int horasContratadas;
     @Column(name = "Especialidad_idEspecialidad", nullable = false)
     private int idEspecialidad;
@@ -29,7 +29,8 @@ public class Profesor implements Serializable {
     public Profesor() {
     }
 
-    public Profesor(String nombre, String apellidos, int antiguedad, int horasContratadas, int idEspecialidad) {
+    public Profesor(int nif, String nombre, String apellidos, int antiguedad, int horasContratadas, int idEspecialidad) {
+        this.nif = nif;
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.antiguedad = antiguedad;
@@ -37,6 +38,14 @@ public class Profesor implements Serializable {
         this.idEspecialidad = idEspecialidad;
     }
 
+    public int getNif() {
+        return nif;
+    }
+
+    public void setNif(int nif) {
+        this.nif = nif;
+    }
+    
     public String getNombre() {
         return nombre;
     }

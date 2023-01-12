@@ -7,13 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e8ddd05-a24f-4377-a402-c5118633b06d" name="Changes" comment="&quot;Cambio a H2&quot;">
+    <list default="true" id="5e8ddd05-a24f-4377-a402-c5118633b06d" name="Changes" comment="&quot;Change hbm2ddl.auto to 'update' value and include Create and Read functions for 'Profesor' class to test the connectivity and basic functions.&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/h2/bd/cesarManrique.mv.db" beforeDir="false" afterPath="$PROJECT_DIR$/h2/bd/cesarManrique.mv.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/h2/bd/cesarManrique.trace.db" beforeDir="false" afterPath="$PROJECT_DIR$/h2/bd/cesarManrique.trace.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/danielCastro/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/danielCastro/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/danielCastro/Profesor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/danielCastro/Profesor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +113,10 @@
       <workItem from="1673347226024" duration="3395000" />
       <workItem from="1673360279884" duration="344000" />
       <workItem from="1673392100533" duration="1966000" />
-      <workItem from="1673433400010" duration="674000" />
+      <workItem from="1673433400010" duration="915000" />
+      <workItem from="1673440777035" duration="1815000" />
+      <workItem from="1673470630494" duration="5692000" />
+      <workItem from="1673478615815" duration="12000" />
     </task>
     <task id="LOCAL-00001" summary="&quot;First commit&quot;">
       <created>1672691915180</created>
@@ -162,7 +160,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673360615184</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="&quot;Change hbm2ddl.auto to 'update' value and include Create and Read functions for 'Profesor' class to test the connectivity and basic functions.&quot;">
+      <created>1673439535130</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1673439535130</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -188,7 +193,8 @@
     <MESSAGE value="&quot;Add encodings.xml&quot;" />
     <MESSAGE value="&quot;Un poco de todo&quot;" />
     <MESSAGE value="&quot;Cambio a H2&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Cambio a H2&quot;" />
+    <MESSAGE value="&quot;Change hbm2ddl.auto to 'update' value and include Create and Read functions for 'Profesor' class to test the connectivity and basic functions.&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Change hbm2ddl.auto to 'update' value and include Create and Read functions for 'Profesor' class to test the connectivity and basic functions.&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

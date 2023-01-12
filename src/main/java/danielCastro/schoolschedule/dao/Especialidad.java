@@ -1,4 +1,4 @@
-package danielCastro;
+package danielCastro.schoolschedule.dao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,9 +13,9 @@ public class Especialidad implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "idEspecialidad")
+    @Column(name = "IDESPECIALIDAD")
     private int idEspecialidad;
-    @Column(name = "Nombre")
+    @Column(name = "NOMBRE")
     private String nombre;
 
     public Especialidad() {
@@ -24,10 +24,14 @@ public class Especialidad implements Serializable {
     public Especialidad(int idEspecialidad, String nombre) {
         this.idEspecialidad = idEspecialidad;
         this.nombre = nombre;
-    }
-
+    }  
+    
     public int getIdEspecialidad() {
         return idEspecialidad;
+    }
+    
+    public void setIdEspecialidad(int idEspecialidad) {
+        this.idEspecialidad = idEspecialidad;
     }
 
     public String getNombre() {

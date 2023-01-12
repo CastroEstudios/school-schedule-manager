@@ -4,7 +4,7 @@ create table Especialidad (
 );
 
 create table Profesor (
-	idProfesor int primary key auto_increment,
+	NIF char(9) primary key,
 	Nombre varchar(45) not null,
 	Apellidos varchar(100) not null,
 	Antiguedad smallint not null,
@@ -48,13 +48,13 @@ create table Modulo_Curso (
 );
 
 create table Modulos_Profesor (
-	Profesor_idProfesor int not null,
+	Profesor_NIF int not null,
 	Modulo_idModulo int not null,
 	Curso_idCurso int not null,
-	foreign key (Profesor_idProfesor) references Profesor(idProfesor),
+	foreign key (Profesor_NIF) references Profesor(NIF),
 	foreign key (Modulo_idModulo) references Modulo(idModulo),
 	foreign key (Curso_idCurso) references Curso(idCurso),
-	primary key (Profesor_idProfesor, Modulo_idModulo, Curso_idCurso)
+	primary key (Profesor_NIF, Modulo_idModulo, Curso_idCurso)
 );
 
 insert into Especialidad values (1, 'Ciencias de la Información');

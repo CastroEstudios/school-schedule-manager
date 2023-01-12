@@ -1,4 +1,4 @@
-package danielCastro;
+package danielCastro.schoolschedule.dao;
 
 public class Modulo {
     int horasReales;
