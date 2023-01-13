@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
  * @author Anima
  */
 public class PantallaLogIn extends javax.swing.JFrame {
-    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
+    public static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
     /**
      * Creates new form PantallaLogIn
      */
@@ -209,12 +209,16 @@ public class PantallaLogIn extends javax.swing.JFrame {
         Login login;
         try {
             login = tq.getSingleResult();
-            PantallaPrincipal pp = new PantallaPrincipal();
-            this.setVisible(false);
-            pp.setVisible(true);
+            if(login.getPermisos().equals("SA")) {
+                PantallaCRUD pp = new PantallaCRUD();
+                this.setVisible(false);
+                pp.setVisible(true);
+            }
         }catch (NoResultException nrex) {
             JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos."
                     , "Error de credenciales", JOptionPane.ERROR_MESSAGE);
+        }catch (Exception ex) {
+            ex.printStackTrace();
         }finally {
             em.close();
         }
