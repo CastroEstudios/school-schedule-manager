@@ -10,8 +10,6 @@ import java.io.Serializable;
 @Table(name = "Especialidad")
 public class Especialidad implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Id
     @Column(name = "IDESPECIALIDAD")
     private int idEspecialidad;

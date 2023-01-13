@@ -1,6 +1,5 @@
 package danielCastro.schoolschedule.dao;
 
-import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -8,13 +7,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table (name = "Profesor")
-public class Profesor implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Profesor {
 
     @Id
     @Column(name = "NIF", unique = true)
-    private int nif;
+    private String nif;
     @Column(name = "Nombre", nullable = false)
     private String nombre;
     @Column(name = "Apellidos", nullable = false)
@@ -29,7 +26,7 @@ public class Profesor implements Serializable {
     public Profesor() {
     }
 
-    public Profesor(int nif, String nombre, String apellidos, int antiguedad, int horasContratadas, int idEspecialidad) {
+    public Profesor(String nif, String nombre, String apellidos, int antiguedad, int horasContratadas, int idEspecialidad) {
         this.nif = nif;
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -38,11 +35,11 @@ public class Profesor implements Serializable {
         this.idEspecialidad = idEspecialidad;
     }
 
-    public int getNif() {
+    public String getNif() {
         return nif;
     }
 
-    public void setNif(int nif) {
+    public void setNif(String nif) {
         this.nif = nif;
     }
     
