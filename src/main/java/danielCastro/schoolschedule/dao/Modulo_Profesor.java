@@ -15,24 +15,26 @@ import javax.persistence.Table;
  * @author Anima
  */
 @Entity
-@Table (name = "Login")
-public class Login {
+@Table(name = "MODULOS_PROFESOR")
+public class Modulo_Profesor implements Serializable {
     
     @Id
     @Column(name = "PROFESOR_NIF")
     private String profesor_nif;
-    @Column(name = "PERMISOS")
-    private String permisos;
-    @Column(name = "CLAVE")
-    private String clave;
+    @Id
+    @Column(name = "MODULO_IDMODULO")
+    private int idModulo;
+    @Id
+    @Column(name = "CURSO_IDCURSO")
+    private int idCurso;
 
-    public Login() {
+    public Modulo_Profesor() {
     }
 
-    public Login(String profesor_nif, String permisos, String clave) {
+    public Modulo_Profesor(String profesor_nif, int idModulo, int idCurso) {
         this.profesor_nif = profesor_nif;
-        this.permisos = permisos;
-        this.clave = clave;
+        this.idModulo = idModulo;
+        this.idCurso = idCurso;
     }
 
     public String getProfesor_nif() {
@@ -43,21 +45,21 @@ public class Login {
         this.profesor_nif = profesor_nif;
     }
 
-    public String getPermisos() {
-        return permisos;
+    public int getIdModulo() {
+        return idModulo;
     }
 
-    public void setPermisos(String permisos) {
-        this.permisos = permisos;
+    public void setIdModulo(int idModulo) {
+        this.idModulo = idModulo;
     }
 
-    public String getClave() {
-        return clave;
+    public int getIdCurso() {
+        return idCurso;
     }
 
-    @Override
-    public String toString() {
-        return profesor_nif + " | " + permisos + " | " +  clave;
+    public void setIdCurso(int idCurso) {
+        this.idCurso = idCurso;
     }
-
+    
+    
 }

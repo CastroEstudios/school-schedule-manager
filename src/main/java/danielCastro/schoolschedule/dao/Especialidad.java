@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "Especialidad")
-public class Especialidad implements Serializable {
+public class Especialidad {
 
     @Id
     @Column(name = "IDESPECIALIDAD")
