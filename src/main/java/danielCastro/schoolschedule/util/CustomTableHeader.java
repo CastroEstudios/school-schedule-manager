@@ -9,6 +9,8 @@ import java.awt.Component;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
@@ -25,7 +27,11 @@ public class CustomTableHeader extends DefaultTableCellRenderer{
             label.setForeground(Color.WHITE);
         } else {
             label.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+            label.setBorder(new CompoundBorder(label.getBorder(), new EmptyBorder(10, 10, 10, 10)));
+
         }
+
+
         return label;
     } 
     

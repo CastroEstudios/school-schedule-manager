@@ -48,6 +48,8 @@ public class PantallaLogIn extends javax.swing.JFrame {
         styles();
         addBGImages();
         randomImg(labelIntoJPanel(jPanelImg));
+        initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG15.png", labelIntoJPanel(jPanelImg));
+        initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG8.png", labelIntoJPanel(jPanelMain));
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\userIcon.png", jLabelUser);
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\pswKey.png", jLabelPsw);
     }
@@ -61,13 +63,13 @@ public class PantallaLogIn extends javax.swing.JFrame {
         jTextPassword.setBackground(Color.decode("#f7f7f2"));
         jTextPassword.setBorder(new CompoundBorder(new LineBorder(Color.decode("#6c757d"), 2), new EmptyBorder(5,5,5,5)));
         
-        jPanelImg.setBackground(Color.decode("#dde5b6"));
-        jPanelMain.setBackground(Color.decode("#f0ead2"));
+        jPanelImg.setBackground(Color.decode("#a2c7de"));
+        jPanelMain.setBackground(Color.decode("#a2c7de"));
         
         jBotonLog.putClientProperty("JButton.buttonType","roundRect");
         jBotonClear.putClientProperty("JButton.buttonType","roundRect");
-        jBotonLog.setBackground(Color.decode("#d67487"));
-        jBotonClear.setBackground(Color.decode("#d67487"));
+        jBotonLog.setBackground(Color.decode("#6e8a89"));
+        jBotonClear.setBackground(Color.decode("#6e8a89"));
     }
     
     private void addBGImages() {
@@ -80,7 +82,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         }
     }
         
-    private JLabel labelIntoJPanel(JPanel panel) {
+    public static JLabel labelIntoJPanel(JPanel panel) {
         JLabel label = new JLabel();
         panel.setLayout(new BorderLayout());
         panel.add(label, BorderLayout.CENTER);
@@ -88,7 +90,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         return label;
     }
     
-    private void initBGImage(String url, JLabel label) {
+    public static void initBGImage(String url, JLabel label) {
         BufferedImage img = null;
         try {
             img = ImageIO.read(new File(url));
@@ -248,7 +250,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
 
         jPanelBotones.setOpaque(false);
 
-        jBotonLog.setFont(new java.awt.Font("Lucida Sans Unicode", 1, 16)); // NOI18N
+        jBotonLog.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 18)); // NOI18N
         jBotonLog.setText("Iniciar Sesión");
         jBotonLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -256,7 +258,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
             }
         });
 
-        jBotonClear.setFont(new java.awt.Font("Lucida Sans Unicode", 1, 16)); // NOI18N
+        jBotonClear.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 18)); // NOI18N
         jBotonClear.setText("Limpiar Credenciales");
         jBotonClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -340,7 +342,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
             login = tq.getSingleResult();
             if(login.getPermisos().equals("SA")) {
                 PantallaCRUD pp = new PantallaCRUD();
-                this.setVisible(false);
+                this.dispose();
                 pp.setVisible(true);
             }
         }catch (NoResultException nrex) {
