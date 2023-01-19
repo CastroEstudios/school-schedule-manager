@@ -8,6 +8,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import danielCastro.schoolschedule.dao.Especialidad;
 import danielCastro.schoolschedule.util.CustomTableHeader;
 import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -16,12 +17,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -29,9 +33,11 @@ import javax.swing.table.DefaultTableModel;
  * @author Anima
  */
 public class PantallaCRUD extends javax.swing.JFrame {
+
     DefaultTableModel dtm = new DefaultTableModel();
     List<Class> listaClases = new ArrayList();
-    List<Object> listaCreate = new ArrayList();
+    Map<Class, List> arrayLists = new HashMap<>();
+
     /**
      * Creates new form PantallaPrincipal
      */
@@ -40,21 +46,20 @@ public class PantallaCRUD extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         styles();
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG4.png"
-                , PantallaLogIn.labelIntoJPanel(jPanel1));
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG4.png",
+                 PantallaLogIn.labelIntoJPanel(jPanel1));
         classesToArrayList();
-        updateTable(listaClases.get(0));
+        createArrayLists();
         comboListener();
     }
-   
-    
+
     private void styles() {
         jTable.getTableHeader().setDefaultRenderer(new CustomTableHeader());
         jTable.setDefaultRenderer(Object.class, new CustomTableHeader());
         jPanelMenu.setBackground(Color.decode("#dde5b6"));
         jPanelTable.setBackground(Color.decode("#dde5b6"));
     }
-    
+
     private void classesToArrayList() {
         // package name
         String packageName = "danielCastro.schoolschedule.dao";
@@ -67,9 +72,9 @@ public class PantallaCRUD extends javax.swing.JFrame {
         File packageDir = new File(packageURL.getFile());
         File[] files = packageDir.listFiles();
 
-        for(File file : files) {
-            if(file.isFile() && file.getName().endsWith(".class")) {
-                String className = packageName + "." + file.getName().substring(0, file.getName().length()-6);
+        for (File file : files) {
+            if (file.isFile() && file.getName().endsWith(".class")) {
+                String className = packageName + "." + file.getName().substring(0, file.getName().length() - 6);
                 try {
                     Class<?> clazz = Class.forName(className);
                     listaClases.add(clazz);
@@ -81,53 +86,101 @@ public class PantallaCRUD extends javax.swing.JFrame {
         }
     }
 
-    private void updateTable(Class clazz) {
-        dtm.setRowCount(0);
-        dtm.setColumnCount(0);
-        Object[] listaAtt = getAttributeNames(clazz).toArray();
-        dtm.setColumnIdentifiers(listaAtt);
-        jTable.setModel(dtm);
-        EntityManager em = PantallaLogIn.emf.createEntityManager();
-        String query = "SELECT p FROM " + clazz.getSimpleName() + " p";
-        TypedQuery tq = em.createQuery(query, clazz);
-        List listaClase;
-        try {
-            listaClase = tq.getResultList();
-            for (Object object : listaClase) {
-                Field[] arrayAttObj = object.getClass().getDeclaredFields();
-                Object[] values = new Object[arrayAttObj.length];
-                int i = 0;
-                for(Field field : arrayAttObj){
-                  field.setAccessible(true);
-                  values[i] = field.get(object);
-                  i++;
-                  field.setAccessible(false);
-                }
-                dtm.addRow(values);
-            }
-
-        }catch (NoResultException nrex) {
-            System.out.println("no");
-        }catch (Exception ex) {
-            ex.printStackTrace();
-        }finally {
-            em.close();
+    private void createArrayLists() {
+        for (Class clazz : listaClases) {
+            List arrayList = new ArrayList();
+            arrayLists.put(clazz, arrayList);
         }
-        
+        extractDBData();
+        for (Class clazz : listaClases) {
+            if (clazz.getSimpleName().equals(jComboTabla.getSelectedItem())) {
+                updateTable(clazz, false);
+                break;
+            }
+        }
     }
-    
+
+    private void extractDBData() {
+        for (Class clazz : listaClases) {
+            EntityManager em = PantallaLogIn.emf.createEntityManager();
+            String nombreClase = clazz.getSimpleName();
+            String query = "SELECT p FROM " + nombreClase + " p";
+            TypedQuery tq = em.createQuery(query, clazz);
+            List<Object> listaClase;
+            try {
+                listaClase = tq.getResultList();
+                arrayLists.get(clazz).addAll(listaClase);
+            } catch (NoResultException nrex) {
+                System.out.println("No se ha encontrado ningún resultado en la BD.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                em.close();
+            }
+        }
+    }
+
     private void comboListener() {
         jComboTabla.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Object selectedItem = jComboTabla.getSelectedItem();
                 for (Class clazz : listaClases) {
-                    if(clazz.getSimpleName().equals(selectedItem))
-                        updateTable(clazz);
+                    if (clazz.getSimpleName().equals(selectedItem)) {
+                        updateTable(clazz, true);
+                        break;
+                    }
                 }
             }
         });
     }
+
+    private void updateTable(Class clazz, Boolean guardar) {
+        if (guardar) {
+            guardarValores(clazz);
+        }
+        dtm.setRowCount(0);
+        dtm.setColumnCount(0);
+        Object[] listaAtt = getAttributeNames(clazz).toArray();
+        dtm.setColumnIdentifiers(listaAtt);
+        jTable.setModel(dtm);
+        List listaClase = arrayLists.get(clazz);
+        for (Object object : listaClase) {
+            //Cogo los atributos de cada objeto en listaClase
+            Field[] arrayAttObj = object.getClass().getDeclaredFields();
+            Object[] values = new Object[arrayAttObj.length];
+            int i = 0;
+            //Por cada campo, accedo al valor, lo guardo en values y los añado
+            //como fila en la tabla
+            for (Field field : arrayAttObj) {
+                field.setAccessible(true);
+                try {
+                    values[i] = field.get(object);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                i++;
+                field.setAccessible(false);
+            }
+            dtm.addRow(values);
+        }
+    }
     
+    //Le estoy pasando la clase a la que cambio, no a la que quiero guardar
+    //Además, estoy guardando los datos uno por uno, debería crear un objeto con los datos
+    //Debería hacer un valor global ultimaClase que almacene la ultima clase
+    //Y debería pasarle ese valor por parámetros a la función guardarValores.
+    private void guardarValores(Class clazz) {
+        for (int i = 0; i < jTable.getRowCount(); i++) {
+            ArrayList<Object> rowData = new ArrayList<>();
+            for (int j = 0; j < jTable.getColumnCount(); j++) {
+                rowData.add(jTable.getValueAt(i, j));
+            }
+            arrayLists.get(clazz).addAll(rowData);
+        }
+    }
+
     public static List<String> getAttributeNames(Class clazz) {
         List<String> fieldNames = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
@@ -135,7 +188,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
         }
         return fieldNames;
     }
-  
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -162,6 +215,11 @@ public class PantallaCRUD extends javax.swing.JFrame {
         jPanelMenu.setOpaque(false);
 
         jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         botonCreate.setText("Create");
         botonCreate.addActionListener(new java.awt.event.ActionListener() {
@@ -184,7 +242,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
             }
         });
 
-        jTextField1.setText("Filtrar");
+        jTextField1.setToolTipText("Filtrar");
 
         javax.swing.GroupLayout jPanelMenuLayout = new javax.swing.GroupLayout(jPanelMenu);
         jPanelMenu.setLayout(jPanelMenuLayout);
@@ -301,37 +359,49 @@ public class PantallaCRUD extends javax.swing.JFrame {
         // TODO add your handling code here:
         //Comprueba la clase seleccionada en el comboBox y la guarda
         Object selectedItem = jComboTabla.getSelectedItem();
-        Class selectedClass = Especialidad.class;
+
         for (Class clazz : listaClases) {
-            if(clazz.getSimpleName().equals(selectedItem))
-                selectedClass = clazz;
-        }
-        
-        try {
-            /*
-            It uses the getDeclaredConstructor() method of the Class object to 
-            obtain the default constructor of the class, and the newInstance() 
-            method of the Constructor object to create a new instance of the class
-            */
-            Constructor<?> constructor = selectedClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            Object emptyRow = constructor.newInstance();
-            /*
-            It gets all the fields of the class, and store them in an array of objects
-            in order to be able to create the empty object of the selected class.
-            */
-            Field[] fields = selectedClass.getDeclaredFields();
-            Object[] rowData = new Object[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                fields[i].setAccessible(true);
-                rowData[i] = fields[i].get(emptyRow);
+            if (clazz.getSimpleName().equals(selectedItem))
+                try {
+                /*
+                    It uses the getDeclaredConstructor() method of the Class object to 
+                    obtain the default constructor of the class, and the newInstance() 
+                    method of the Constructor object to create a new instance of the class
+                 */
+                Constructor<?> constructor = clazz.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                Object emptyRow = constructor.newInstance();
+                /*
+                    It gets all the fields of the class, and store them in an array of objects
+                    in order to be able to create the empty object of the selected class.
+                 */
+                Field[] fields = clazz.getDeclaredFields();
+                Object[] rowData = new Object[fields.length];
+                for (int i = 0; i < fields.length; i++) {
+                    fields[i].setAccessible(true);
+                    rowData[i] = fields[i].get(emptyRow);
+                }
+                dtm.addRow(rowData);
+            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                e.printStackTrace();
             }
-            dtm.addRow(rowData);
-        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
         }
 
+
     }//GEN-LAST:event_botonCreateActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        int filaSeleccion = jTable.getSelectedRow();
+        if (filaSeleccion != -1) {
+            dtm.removeRow(filaSeleccion);
+        } else {
+            Toolkit.getDefaultToolkit().beep();
+            JOptionPane.showMessageDialog(null, "No hay ninguna fila seleccionada."
+                    + " Seleccione una fila para eliminarla.",
+                     "Error de selección", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
