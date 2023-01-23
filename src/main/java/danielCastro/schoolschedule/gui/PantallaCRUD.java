@@ -5,7 +5,7 @@
 package danielCastro.schoolschedule.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import danielCastro.schoolschedule.dao.Especialidad;
+import danielCastro.schoolschedule.dao.Ciclo;
 import danielCastro.schoolschedule.util.CustomTableHeader;
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -36,7 +36,9 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     DefaultTableModel dtm = new DefaultTableModel();
     List<Class> listaClases = new ArrayList();
+    Class ultimaClase;
     Map<Class, List> arrayLists = new HashMap<>();
+    List listaBorrados = new ArrayList();
 
     /**
      * Creates new form PantallaPrincipal
@@ -136,7 +138,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     private void updateTable(Class clazz, Boolean guardar) {
         if (guardar) {
-            guardarValores(clazz);
+            guardarValores(ultimaClase);
         }
         dtm.setRowCount(0);
         dtm.setColumnCount(0);
@@ -165,6 +167,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
             }
             dtm.addRow(values);
         }
+        ultimaClase = clazz;
     }
     
     //Le estoy pasando la clase a la que cambio, no a la que quiero guardar
@@ -172,14 +175,60 @@ public class PantallaCRUD extends javax.swing.JFrame {
     //Debería hacer un valor global ultimaClase que almacene la ultima clase
     //Y debería pasarle ese valor por parámetros a la función guardarValores.
     private void guardarValores(Class clazz) {
-        for (int i = 0; i < jTable.getRowCount(); i++) {
-            ArrayList<Object> rowData = new ArrayList<>();
-            for (int j = 0; j < jTable.getColumnCount(); j++) {
-                rowData.add(jTable.getValueAt(i, j));
+        // Get the list corresponding to the ultimaClase
+        List arrayList = arrayLists.get(clazz);
+        arrayList.clear();
+        // Get the number of rows in the table
+        int rowCount = jTable.getRowCount();
+        // Go over all the rows in the table
+        for (int i = 0; i < rowCount; i++) {
+            // Create a new instance of the ultimaClase class
+            Object instance = null;
+            try {
+                Constructor constructor = clazz.getConstructor();
+                instance = constructor.newInstance();
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchMethodException ex) {
+                Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
             }
-            arrayLists.get(clazz).addAll(rowData);
+            // Get the number of columns in the table
+            int columnCount = jTable.getColumnCount();
+            // Go over all the columns in the table
+            for (int j = 0; j < columnCount; j++) {
+                // Get the name of the column
+                String columnName = jTable.getColumnName(j);
+                // Get the value of the cell in the current row and column
+                Object value = jTable.getValueAt(i, j);
+                try {
+                    // Get the field of the class corresponding to the column name
+                    Field field = clazz.getDeclaredField(columnName);
+                    // Make the field accessible
+                    field.setAccessible(true);
+                    if (field.getType() == int.class && value instanceof String) {
+                        value = Integer.parseInt((String) value);
+                    }
+                    if (field.getType() == boolean.class && value instanceof String) {
+                        value = Boolean.parseBoolean((String) value);
+                    }
+                    // Set the value of the field in the instance
+                    field.set(instance, value);
+                    field.setAccessible(false);
+                } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                    Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            // Add the instance to the corresponding list in the arrayLists map
+            arrayList.add(instance);
         }
     }
+
 
     public static List<String> getAttributeNames(Class clazz) {
         List<String> fieldNames = new ArrayList<>();
@@ -200,10 +249,10 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanelMenu = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
+        botonDelete = new javax.swing.JButton();
         botonCreate = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        botonCancel = new javax.swing.JButton();
+        botonSave = new javax.swing.JButton();
         jComboTabla = new javax.swing.JComboBox<>();
         jTextField1 = new javax.swing.JTextField();
         jPanelTable = new javax.swing.JPanel();
@@ -214,10 +263,10 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
         jPanelMenu.setOpaque(false);
 
-        jButton3.setText("Delete");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        botonDelete.setText("Delete");
+        botonDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                botonDeleteActionPerformed(evt);
             }
         });
 
@@ -228,17 +277,17 @@ public class PantallaCRUD extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setText("CANCEL");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        botonCancel.setText("CANCEL");
+        botonCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                botonCancelActionPerformed(evt);
             }
         });
 
-        jButton6.setText("SAVE");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        botonSave.setText("SAVE");
+        botonSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                botonSaveActionPerformed(evt);
             }
         });
 
@@ -250,7 +299,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
             jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelMenuLayout.createSequentialGroup()
                 .addGap(44, 44, 44)
-                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jComboTabla, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -258,9 +307,9 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(53, 53, 53))
         );
         jPanelMenuLayout.setVerticalGroup(
@@ -268,10 +317,10 @@ public class PantallaCRUD extends javax.swing.JFrame {
             .addGroup(jPanelMenuLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboTabla, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(19, Short.MAX_VALUE))
@@ -344,16 +393,36 @@ public class PantallaCRUD extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void botonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelActionPerformed
         // TODO add your handling code here:
         PantallaLogIn pli = new PantallaLogIn();
         this.dispose();
         pli.setVisible(true);
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_botonCancelActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void botonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonSaveActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+        guardarValores(ultimaClase);
+        
+        for(Map.Entry<Class, List> entry: arrayLists.entrySet()) {
+            EntityManager em = PantallaLogIn.emf.createEntityManager();
+            Class key = entry.getKey();
+            List listaActual = entry.getValue();
+            
+            for (int i = 0; i < listaActual.size(); i++) {
+                Object appObj = listaActual.get(i);
+                Object idApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(appObj);
+                Object objetoDB = em.find(key, idApp);
+                if(objetoDB != null) {
+                    //Update
+                }else {
+                    //Create
+                    System.out.println("No está");
+                }
+            }
+            em.close();
+        }
+    }//GEN-LAST:event_botonSaveActionPerformed
 
     private void botonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCreateActionPerformed
         // TODO add your handling code here:
@@ -390,7 +459,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     }//GEN-LAST:event_botonCreateActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void botonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonDeleteActionPerformed
         // TODO add your handling code here:
         int filaSeleccion = jTable.getSelectedRow();
         if (filaSeleccion != -1) {
@@ -401,7 +470,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
                     + " Seleccione una fila para eliminarla.",
                      "Error de selección", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_botonDeleteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -440,10 +509,10 @@ public class PantallaCRUD extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botonCancel;
     private javax.swing.JButton botonCreate;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    private javax.swing.JButton botonDelete;
+    private javax.swing.JButton botonSave;
     private javax.swing.JComboBox<String> jComboTabla;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelMenu;

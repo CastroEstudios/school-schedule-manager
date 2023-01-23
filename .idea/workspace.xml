@@ -7,9 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5e8ddd05-a24f-4377-a402-c5118633b06d" name="Changes" comment="&quot;Change hbm2ddl.auto to 'update' value and include Create and Read functions for 'Profesor' class to test the connectivity and basic functions.&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="5e8ddd05-a24f-4377-a402-c5118633b06d" name="Changes" comment="&quot;Change hbm2ddl.auto to 'update' value and include Create and Read functions for 'Profesor' class to test the connectivity and basic functions.&quot;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -117,6 +115,7 @@
       <workItem from="1673440777035" duration="1815000" />
       <workItem from="1673470630494" duration="5692000" />
       <workItem from="1673478615815" duration="12000" />
+      <workItem from="1674158786084" duration="90000" />
     </task>
     <task id="LOCAL-00001" summary="&quot;First commit&quot;">
       <created>1672691915180</created>
@@ -203,11 +202,6 @@
           <properties class="javax.persistence.PersistenceException" package="javax.persistence" />
           <option name="timeStamp" value="2" />
         </breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/danielCastro/Main.java</url>
-          <line>22</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
