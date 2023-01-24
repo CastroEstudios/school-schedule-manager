@@ -37,7 +37,7 @@ import javax.swing.border.LineBorder;
  * @author Anima
  */
 public class PantallaLogIn extends javax.swing.JFrame {
-    public static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
+    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
     List<String> imagePaths = new ArrayList<>();
     /**
      * Creates new form PantallaLogIn
@@ -54,6 +54,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\pswKey.png", jLabelPsw);
     }
     
+    //It sets the styles of the JComponents
     private void styles() {
         jLabelSecondary1.setForeground(Color.decode("#6c757d"));
         jLabelSecondary2.setForeground(Color.decode("#6c757d"));
@@ -72,6 +73,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         jBotonClear.setBackground(Color.decode("#6e8a89"));
     }
     
+    //This method picks up all the tenerifex.png images and puts them into a list.
     private void addBGImages() {
         int i = 1;
         String path = ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\tenerife" + i + ".png";
@@ -81,15 +83,14 @@ public class PantallaLogIn extends javax.swing.JFrame {
             path = ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\tenerife" + i + ".png";
         }
     }
-        
-    public static JLabel labelIntoJPanel(JPanel panel) {
-        JLabel label = new JLabel();
-        panel.setLayout(new BorderLayout());
-        panel.add(label, BorderLayout.CENTER);
-        label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
-        return label;
-    }
     
+    //Grabs one random image on the list and calls initBGImage method to load the image.
+    private void randomImg(JLabel label) {
+        int randomInt = new Random().nextInt(0, imagePaths.size());
+        initBGImage(imagePaths.get(randomInt), label);
+    }
+        
+    //Loads the image into the JLabel created by labelIntoJPanel() method.
     public static void initBGImage(String url, JLabel label) {
         BufferedImage img = null;
         try {
@@ -102,10 +103,14 @@ public class PantallaLogIn extends javax.swing.JFrame {
         ImageIcon icon = new ImageIcon(dimg); 
         label.setIcon(icon);
     }
-
-    private void randomImg(JLabel label) {
-        int randomInt = new Random().nextInt(0, imagePaths.size());
-        initBGImage(imagePaths.get(randomInt), label);
+        
+    //Creates a JLabel inside a JPanel in order to set the background image for that JPanel. 
+    public static JLabel labelIntoJPanel(JPanel panel) {
+        JLabel label = new JLabel();
+        panel.setLayout(new BorderLayout());
+        panel.add(label, BorderLayout.CENTER);
+        label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
+        return label;
     }
     
     /**
@@ -323,6 +328,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextPasswordActionPerformed
 
+    //Validates the user credentials are in the database.
     private void jBotonLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBotonLogActionPerformed
         // TODO add your handling code here:
         String nif = jTextNIF.getText();
@@ -356,6 +362,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jBotonLogActionPerformed
 
+    //Clears both the NIF and Password JTextFields.
     private void jBotonClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBotonClearActionPerformed
         // TODO add your handling code here:
         jTextNIF.setText("");

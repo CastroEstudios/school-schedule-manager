@@ -6,6 +6,7 @@ package danielCastro.schoolschedule.dao;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -17,7 +18,7 @@ import javax.persistence.Table;
 @Table(name = "CURSO")
 public class Curso {
     
-    @Id
+    @Id @GeneratedValue
     @Column(name = "IDCURSO")
     private int idCurso;
     @Column(name = "TURNO")
