@@ -468,10 +468,18 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 Object appObj = listaActual.get(i);
                 Object idApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(appObj);
                 Object objetoDB = em.find(key, idApp);
-                em.getTransaction().begin();
-                objetoDB = em.merge(appObj);
-                em.flush();
-                em.getTransaction().commit();
+                //PROBLEMAS CON LOS ID 0, PONER ID -1?
+                if(objetoDB != null) {
+                    em.getTransaction().begin();
+                    em.merge(appObj);
+                    em.flush();
+                    em.getTransaction().commit();
+                }else {
+                    em.getTransaction().begin();
+                    em.persist(em.merge(appObj));
+                    em.flush();
+                    em.getTransaction().commit();
+                }
             }
             List listaClase = extractDBData(key);
             for (Object object : listaClase) {
@@ -484,7 +492,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
                     //This snippet compares both ids, if both are the same, we know the
                     //object from the database is in the last, then it won't be removed
                     //if it is not, that means it was removed
-                    if (idObjectDB == idObjetoApp) {
+                    if (idObjectDB == idObjetoApp || idObjetoApp =! 1) {
                         isInList = true;
                         break;
                     }
@@ -492,8 +500,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 if (!isInList) {
                     try {
                         em.getTransaction().begin();
-                        //No borrar bien
-                        em.remove(object);
+                        em.remove(em.merge(object));
                         em.getTransaction().commit();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -533,6 +540,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
                         rowData[i] = fields[i].get(emptyRow);
                     }
                     dtm.addRow(rowData);
+                    dtm.setValueAt(-1, dtm.getRowCount() - 1, 0);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
