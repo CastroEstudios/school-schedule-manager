@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
@@ -50,7 +51,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
         styles();
         PantallaLogIn.initBGImage(
                 ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG4.png",
-                 PantallaLogIn.labelIntoJPanel(jPanel1));
+                PantallaLogIn.labelIntoJPanel(jPanel1));
         classesToArrayList();
         createArrayLists();
         comboListener();
@@ -60,9 +61,25 @@ public class PantallaCRUD extends javax.swing.JFrame {
         //Applies the CustomTableHeader class to the Header and the rest of the table
         jTable.getTableHeader().setDefaultRenderer(new CustomTableHeader());
         jTable.setDefaultRenderer(Object.class, new CustomTableHeader());
-        //Background colors
+        //Set background colors
         jPanelMenu.setBackground(Color.decode("#dde5b6"));
         jPanelTable.setBackground(Color.decode("#dde5b6"));
+        //Makes the primary key rows uneditable
+    }
+
+    private Object objectInstance(Class clazz) {
+        Object instance = null;
+        try {
+            //Creates a new constructor of the class 'clazz' and sets the
+            //Object 'instance' to use that constructor
+            Constructor constructor = clazz.getConstructor();
+            instance = constructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException ex) {
+            Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return instance;
     }
 
     //Method that stores all the classes in a list for its use.
@@ -95,14 +112,20 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     //Method that creates a list for each class to store the DB info
     private void createArrayLists() {
+        //Fills the map with empty ArrayLists
         for (Class clazz : listaClases) {
             List arrayList = new ArrayList();
             arrayLists.put(clazz, arrayList);
         }
-        extractDBData();
+        //Populates the ArrayLists with the data from the DB
+        for (Class clazz : listaClases) {
+            arrayLists.get(clazz).addAll(extractDBData(clazz));
+        }
+        //Initializes the table to display a class info from the start of the app
         for (Class clazz : listaClases) {
             if (clazz.getSimpleName().equals(jComboTabla.getSelectedItem())) {
                 updateTable(clazz, false);
+                uneditablePK(ultimaClase);
                 break;
             }
         }
@@ -110,27 +133,25 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     //Method that extracts all the info of the database and stores it into its
     //corresponding list.
-    private void extractDBData() {
-        //Selects everything for each class and stores it.
-        for (Class clazz : listaClases) {
-            EntityManager em = emf.createEntityManager();
-            String nombreClase = clazz.getSimpleName();
-            String query = "SELECT p FROM " + nombreClase + " p";
-            TypedQuery tq = em.createQuery(query, clazz);
-            List<Object> listaClase;
-            try {
-                listaClase = tq.getResultList();
-                arrayLists.get(clazz).addAll(listaClase);
-            } catch (NoResultException nrex) {
-                System.out.println("No se ha encontrado ningún resultado en la BD.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                em.close();
-            }
+    private List extractDBData(Class clazz) {
+        //Selects everything for each class and stores it in listaClase.
+        List<Object> listaClase = new ArrayList();
+        EntityManager em = emf.createEntityManager();
+        String nombreClase = clazz.getSimpleName();
+        String query = "SELECT p FROM " + nombreClase + " p";
+        TypedQuery tq = em.createQuery(query, clazz);
+        try {
+            listaClase = tq.getResultList();
+        } catch (NoResultException nrex) {
+            System.out.println("No se ha encontrado ningún resultado en la BD.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            em.close();
         }
+        return listaClase;
     }
-    
+
     //Method that updates the info displaying on the table
     private void updateTable(Class clazz, Boolean guardar) {
         //Method that checks if we are changing the current table selected 
@@ -152,8 +173,8 @@ public class PantallaCRUD extends javax.swing.JFrame {
         //Iterates over all the values in the list in order to display them
         //on the table
         for (Object object : listaClase) {
-            //I grab all the attributes of the selected Class clazz so I can 
-            //iterate through all of them and display them
+            //This piece of code grabs all the attributes of the selected Class clazz 
+            //and it iterates through all of them
             Field[] arrayAttObj = object.getClass().getDeclaredFields();
             Object[] values = new Object[arrayAttObj.length];
             int i = 0;
@@ -188,11 +209,31 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 for (Class clazz : listaClases) {
                     if (clazz.getSimpleName().equals(selectedItem)) {
                         updateTable(clazz, true);
+                        uneditablePK(ultimaClase);
                         break;
                     }
                 }
             }
         });
+    }
+
+    private void uneditablePK(Class clazz) {
+        Field[] fields = clazz.getDeclaredFields();
+        List<Field> idFields = new ArrayList();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Id.class)) {
+                idFields.add(field);
+            }
+        }
+//        jTable.setDefaultEditor(Object.class, null);
+        for (int i = 0; i < jTable.getColumnCount(); i++) {
+            for (Field field : idFields) {
+                if (jTable.getColumnName(i).equals(field.getName())) {
+//                    TableColumnModel columnModel = jTable.getColumnModel();
+//                    columnModel.getColumn(i).setCellRenderer(new UneditableRenderer());
+                }
+            }
+        }
     }
 
     //Method that checks if we are changing the current table selected 
@@ -207,17 +248,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
         // Go over all the rows in the table
         for (int i = 0; i < rowCount; i++) {
             // Create a new instance of the ultimaClase class
-            Object instance = null;
-            try {
-                //Creates a new constructor of the class 'clazz' and sets the
-                //Object 'instance' to use that constructor
-                Constructor constructor = clazz.getConstructor();
-                instance = constructor.newInstance();
-            } catch (InstantiationException | IllegalAccessException 
-                    | IllegalArgumentException | InvocationTargetException 
-                    | NoSuchMethodException | SecurityException ex) {
-                Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            Object instance = objectInstance(clazz);
             // Get the number of columns in the table
             int columnCount = jTable.getColumnCount();
             // Go over all the columns in the table
@@ -422,13 +453,17 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     private void botonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonSaveActionPerformed
         // TODO add your handling code here:
+        //Saves the values on the current table in its corresponding arrayLists list
         guardarValores(ultimaClase);
-        
-        for(Map.Entry<Class, List> entry: arrayLists.entrySet()) {
+
+        //This code iterates through all of the lists in arrayLists
+        for (Map.Entry<Class, List> entry : arrayLists.entrySet()) {
             EntityManager em = emf.createEntityManager();
             Class key = entry.getKey();
             List listaActual = entry.getValue();
-            
+
+            //If the object needs to be created or updated, it is merged on
+            //the database and then flushed to execute the update.
             for (int i = 0; i < listaActual.size(); i++) {
                 Object appObj = listaActual.get(i);
                 Object idApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(appObj);
@@ -438,37 +473,39 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 em.flush();
                 em.getTransaction().commit();
             }
-            
-            String nombreClase = key.getSimpleName();
-            String query = "SELECT p FROM " + nombreClase + " p";
-            TypedQuery tq = em.createQuery(query, key);
-            List<Object> listaClase = null;
-            try {
-                listaClase = tq.getResultList();
-            } catch (NoResultException nrex) {
-                System.out.println("No se ha encontrado ningún resultado en la BD.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            
+            List listaClase = extractDBData(key);
             for (Object object : listaClase) {
-                boolean isInDB = false;
-                Object idObject = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(object);
-                for (Object objectActual : listaActual) {
-                    Object idObjectActual = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(objectActual);
-                    if(idObject == idObjectActual) {
-                        isInDB = true;
+                boolean isInList = false;
+                //The code iterate through the database and for each object it get its id
+                Object idObjectDB = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(object);
+                for (Object objetoApp : listaActual) {
+                    //The code iterate through the arrayList lists and for each object it get its id
+                    Object idObjetoApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(objetoApp);
+                    //This snippet compares both ids, if both are the same, we know the
+                    //object from the database is in the last, then it won't be removed
+                    //if it is not, that means it was removed
+                    if (idObjectDB == idObjetoApp) {
+                        isInList = true;
                         break;
                     }
                 }
-                if (!isInDB) {
-                    em.getTransaction().begin();
-                    em.remove(object);
-                    em.getTransaction().commit();
+                if (!isInList) {
+                    try {
+                        em.getTransaction().begin();
+                        //No borrar bien
+                        em.remove(object);
+                        em.getTransaction().commit();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             em.close();
         }
+
+        PantallaCRUD screenCRUD = new PantallaCRUD();
+        this.dispose();
+        screenCRUD.setVisible(true);
     }//GEN-LAST:event_botonSaveActionPerformed
 
     private void botonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCreateActionPerformed
@@ -477,33 +514,30 @@ public class PantallaCRUD extends javax.swing.JFrame {
         Object selectedItem = jComboTabla.getSelectedItem();
 
         for (Class clazz : listaClases) {
-            if (clazz.getSimpleName().equals(selectedItem))
+            if (clazz.getSimpleName().equals(selectedItem)) {
                 try {
-                /*
-                    It uses the getDeclaredConstructor() method of the Class object to 
-                    obtain the default constructor of the class, and the newInstance() 
-                    method of the Constructor object to create a new instance of the class
-                 */
-                Constructor<?> constructor = clazz.getDeclaredConstructor();
-                constructor.setAccessible(true);
-                Object emptyRow = constructor.newInstance();
-                /*
-                    It gets all the fields of the class, and store them in an array of objects
-                    in order to be able to create the empty object of the selected class.
-                 */
-                Field[] fields = clazz.getDeclaredFields();
-                Object[] rowData = new Object[fields.length];
-                for (int i = 0; i < fields.length; i++) {
-                    fields[i].setAccessible(true);
-                    rowData[i] = fields[i].get(emptyRow);
+                    /*
+                        It uses the getDeclaredConstructor() method of the Class object to 
+                        obtain the default constructor of the class, and the newInstance() 
+                        method of the Constructor object to create a new instance of the class
+                     */
+                    Object emptyRow = objectInstance(clazz);
+                    /*
+                        It gets all the fields of the class, and store them in an array of objects
+                        in order to be able to create the empty object of the selected class.
+                     */
+                    Field[] fields = clazz.getDeclaredFields();
+                    Object[] rowData = new Object[fields.length];
+                    for (int i = 0; i < fields.length; i++) {
+                        fields[i].setAccessible(true);
+                        rowData[i] = fields[i].get(emptyRow);
+                    }
+                    dtm.addRow(rowData);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-                dtm.addRow(rowData);
-            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                e.printStackTrace();
             }
         }
-
-
     }//GEN-LAST:event_botonCreateActionPerformed
 
     private void botonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonDeleteActionPerformed
@@ -515,7 +549,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
             Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(null, "No hay ninguna fila seleccionada."
                     + " Seleccione una fila para eliminarla.",
-                     "Error de selección", JOptionPane.ERROR_MESSAGE);
+                    "Error de selección", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_botonDeleteActionPerformed
 

@@ -5,6 +5,7 @@
 package danielCastro.schoolschedule.dao;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -61,5 +62,18 @@ public class Modulo_Profesor implements Serializable {
         this.idCurso = idCurso;
     }
     
-    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Modulo_Profesor parametreObject = (Modulo_Profesor) obj;
+        return this.getIdModulo() == parametreObject.getIdModulo() 
+                && this.getIdCurso() == parametreObject.getIdCurso()
+                && this.getProfesor_nif().equals(parametreObject.getProfesor_nif());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idModulo, idCurso);
+    }
 }
