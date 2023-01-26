@@ -5,6 +5,14 @@
 package danielCastro.schoolschedule.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import danielCastro.schoolschedule.dao.Ciclo;
+import danielCastro.schoolschedule.dao.Curso;
+import danielCastro.schoolschedule.dao.Especialidad;
+import danielCastro.schoolschedule.dao.Login;
+import danielCastro.schoolschedule.dao.Modulo;
+import danielCastro.schoolschedule.dao.Modulo_Curso;
+import danielCastro.schoolschedule.dao.Modulo_Profesor;
+import danielCastro.schoolschedule.dao.Profesor;
 import danielCastro.schoolschedule.util.CustomTableHeader;
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -16,7 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -40,7 +48,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
     DefaultTableModel dtm = new DefaultTableModel();
     List<Class> listaClases = new ArrayList();
     Class ultimaClase;
-    Map<Class, List> arrayLists = new HashMap<>();
+    LinkedHashMap<Class, List> arrayLists = new LinkedHashMap<>();
 
     /**
      * Creates new form PantallaPrincipal
@@ -49,7 +57,8 @@ public class PantallaCRUD extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         styles();
-        classesToArrayList();
+        //classesToArrayList();
+        fixedClassesToArrayList();
         createArrayLists();
         comboListener();
     }
@@ -121,6 +130,25 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 }
             }
         }
+    }
+    
+    private void fixedClassesToArrayList() {
+        listaClases.add(0, Especialidad.class);
+        listaClases.add(1, Profesor.class);
+        listaClases.add(2, Modulo.class);
+        listaClases.add(3, Ciclo.class);
+        listaClases.add(4, Curso.class);
+        listaClases.add(5, Modulo_Curso.class);
+        listaClases.add(6, Modulo_Profesor.class);
+        listaClases.add(7, Login.class);
+        jComboTabla.addItem("Especialidad");
+        jComboTabla.addItem("Profesor");
+        jComboTabla.addItem("Modulo");
+        jComboTabla.addItem("Ciclo");
+        jComboTabla.addItem("Curso");
+        jComboTabla.addItem("Modulo_Curso");
+        jComboTabla.addItem("Modulo_Profesor");
+        jComboTabla.addItem("Login");
     }
 
     //Method that creates a list for each class to store the DB info
@@ -197,9 +225,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 field.setAccessible(true);
                 try {
                     values[i] = field.get(object);
-                } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
                     Logger.getLogger(PantallaCRUD.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 i++;
@@ -367,17 +393,17 @@ public class PantallaCRUD extends javax.swing.JFrame {
             jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelMenuLayout.createSequentialGroup()
                 .addGap(37, 37, 37)
-                .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(68, 68, 68)
+                .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(78, 78, 78)
                 .addComponent(jComboTabla, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(51, 51, 51)
                 .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
-                .addGap(51, 51, 51)
-                .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(49, 49, 49)
-                .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(75, 75, 75)
-                .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(63, 63, 63)
+                .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(60, 60, 60)
+                .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(86, 86, 86)
+                .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(35, 35, 35))
         );
         jPanelMenuLayout.setVerticalGroup(
@@ -386,20 +412,19 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanelMenuLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelMenuLayout.createSequentialGroup()
-                        .addGap(25, 25, 25)
                         .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jComboTabla)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelMenuLayout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(botonDelete, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                                    .addComponent(botonCreate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
                 .addContainerGap(19, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboTabla))
-                .addGap(33, 33, 33))
         );
 
         jPanelTable.setOpaque(false);
@@ -489,14 +514,21 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
             //If the object needs to be created or updated, it is merged on
             //the database and then flushed to execute the update.
-            for (int i = 0; i < listaActual.size(); i++) {
-                Object appObj = listaActual.get(i);
-                Object idApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(appObj);
-                Object objetoDB = em.find(key, idApp);
-                em.getTransaction().begin();
-                objetoDB = em.merge(appObj);
-                em.flush();
-                em.getTransaction().commit();
+            try {
+                for (int i = 0; i < listaActual.size(); i++) {
+                    Object appObj = listaActual.get(i);
+                    Object idApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(appObj);
+                    Object objetoDB = em.find(key, idApp);
+                    em.getTransaction().begin();
+                    objetoDB = em.merge(appObj);
+                    em.flush();
+                    em.getTransaction().commit();
+                }
+            }catch(Exception e) {
+                Toolkit.getDefaultToolkit().beep();
+                JOptionPane.showMessageDialog(null, "Datos incorrectos."
+                    , "Error de inserción", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
             List listaClase = extractDBData(key);
             for (Object object : listaClase) {
