@@ -1,5 +1,5 @@
 CREATE TABLE Especialidad (
-    idEspecialidad SMALLINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    idEspecialidad SMALLINT NOT NULL PRIMARY KEY,
     Nombre VARCHAR(100) NOT NULL
 );
 
@@ -14,7 +14,7 @@ create table Profesor (
 );
 
 create table Modulo (
-	idModulo int AUTO_INCREMENT not null primary key,
+	idModulo int not null primary key,
 	Nombre varchar(45) not null,
 	HorasReales smallint not null,
 	HorasPonderadas smallint not null,
@@ -24,15 +24,15 @@ create table Modulo (
 );
 
 create table Ciclo (
-	idCiclo int AUTO_INCREMENT not null primary key,
+	idCiclo int not null primary key,
 	Nombre varchar(45) not null,
 	Nivel enum ('Básico', 'Medio', 'Superior') default 'Medio' not null,
 	Especialidad_idEspecialidad smallint not null,
 	foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)
-)
+);
 
 create table Curso (
-	idCurso int AUTO_INCREMENT not null primary key,
+	idCurso int not null primary key,
 	Turno enum ('Manana', 'Tarde', 'Noche') default 'Manana' not null,
 	Nivel tinyint not null,
 	Ciclo_idCiclo int not null,

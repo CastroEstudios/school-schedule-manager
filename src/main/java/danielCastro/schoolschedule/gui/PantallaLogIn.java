@@ -25,6 +25,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -102,6 +103,19 @@ public class PantallaLogIn extends javax.swing.JFrame {
         Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(dimg); 
         label.setIcon(icon);
+    }
+    
+    public static void initBGImage(String url, JButton boton) {
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File(url));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Image dimg = img.getScaledInstance(boton.getWidth(), boton.getHeight(),
+        Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(dimg); 
+        boton.setIcon(icon);
     }
         
     //Creates a JLabel inside a JPanel in order to set the background image for that JPanel. 

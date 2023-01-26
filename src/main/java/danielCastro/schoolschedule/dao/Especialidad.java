@@ -1,17 +1,16 @@
 package danielCastro.schoolschedule.dao;
 
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
-import javax.persistence.GeneratedValue;
 
 @Entity
 @Table(name = "Especialidad")
-public class Especialidad {
+public class Especialidad implements Serializable {
 
-    @Id @GeneratedValue
+    @Id
     @Column(name = "IDESPECIALIDAD")
     private int idEspecialidad;
     @Column(name = "NOMBRE")

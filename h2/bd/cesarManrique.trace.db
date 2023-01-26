@@ -3532,3 +3532,150 @@ Caused by: org.h2.mvstore.MVStoreException: The file is locked: F:/Anima/Documen
 	at org.h2.mvstore.FileStore.open(FileStore.java:128)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:452)
 	... 53 more
+2023-01-26 12:09:12 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Cannot drop "PROFESOR" because "CONSTRAINT_453, CONSTRAINT_2" depends on it; SQL statement:
+DROP TABLE PROFESOR [90107-214]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:632)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.command.ddl.DropTable.prepareDrop(DropTable.java:97)
+	at org.h2.command.ddl.DropTable.update(DropTable.java:121)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:169)
+	at org.h2.command.Command.executeUpdate(Command.java:252)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:252)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1339)
+	at org.h2.server.web.WebApp.query(WebApp.java:1137)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1103)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1090)
+	at org.h2.server.web.WebThread.process(WebThread.java:188)
+	at org.h2.server.web.WebThread.run(WebThread.java:101)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+2023-01-26 12:09:24 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Cannot drop "PROFESOR" because "CONSTRAINT_453" depends on it; SQL statement:
+DROP TABLE PROFESOR [90107-214]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:632)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.command.ddl.DropTable.prepareDrop(DropTable.java:97)
+	at org.h2.command.ddl.DropTable.update(DropTable.java:121)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:169)
+	at org.h2.command.Command.executeUpdate(Command.java:252)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:252)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1339)
+	at org.h2.server.web.WebApp.query(WebApp.java:1137)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1103)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1090)
+	at org.h2.server.web.WebThread.process(WebThread.java:188)
+	at org.h2.server.web.WebThread.run(WebThread.java:101)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+2023-01-26 12:09:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Cannot drop "ESPECIALIDAD" because "CONSTRAINT_3D" depends on it; SQL statement:
+DROP TABLE ESPECIALIDAD [90107-214]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:632)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.command.ddl.DropTable.prepareDrop(DropTable.java:97)
+	at org.h2.command.ddl.DropTable.update(DropTable.java:121)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:169)
+	at org.h2.command.Command.executeUpdate(Command.java:252)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:252)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1339)
+	at org.h2.server.web.WebApp.query(WebApp.java:1137)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1103)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1090)
+	at org.h2.server.web.WebThread.process(WebThread.java:188)
+	at org.h2.server.web.WebThread.run(WebThread.java:101)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+2023-01-26 12:10:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table Ciclo (\000d\000a\0009idCiclo int AUTO_INCREMENT not null primary key,\000d\000a\0009Nombre varchar(45) not null,\000d\000a\0009Nivel enum ('Básico', 'Medio', 'Superior') default 'Medio' not null,\000d\000a\0009Especialidad_idEspecialidad smallint not null,\000d\000a\0009foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)\000d\000a)\000d\000a\000d\000a[*]create table Curso (\000d\000a\0009idCurso int AUTO_INCREMENT not null primary key,\000d\000a\0009Turno enum ('Manana', 'Tarde', 'Noche') default 'Manana' not null,\000d\000a\0009Nivel tinyint not null,\000d\000a\0009Ciclo_idCiclo int not null,\000d\000a\0009foreign key (Ciclo_idCiclo) references Ciclo(idCiclo)\000d\000a)"; SQL statement:
+create table Ciclo (
+	idCiclo int AUTO_INCREMENT not null primary key,
+	Nombre varchar(45) not null,
+	Nivel enum ('Básico', 'Medio', 'Superior') default 'Medio' not null,
+	Especialidad_idEspecialidad smallint not null,
+	foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)
+)
+
+create table Curso (
+	idCurso int AUTO_INCREMENT not null primary key,
+	Turno enum ('Manana', 'Tarde', 'Noche') default 'Manana' not null,
+	Nivel tinyint not null,
+	Ciclo_idCiclo int not null,
+	foreign key (Ciclo_idCiclo) references Ciclo(idCiclo)
+) [42000-214]
+2023-01-26 12:10:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CURSO" not found; SQL statement:
+create table Modulo_Curso (
+	Modulo_idModulo int not null,
+	Curso_idCurso int not null,
+	foreign key (Modulo_idModulo) references Modulo(idModulo),
+	foreign key (Curso_idCurso) references Curso(idCurso),
+	primary key(Curso_idCurso, Modulo_idModulo)
+) [42102-214]
+2023-01-26 12:10:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CURSO" not found; SQL statement:
+create table Modulos_Profesor (
+	Profesor_NIF char(9) not null,
+	Modulo_idModulo int not null,
+	Curso_idCurso int not null,
+	foreign key (Profesor_NIF) references Profesor(NIF),
+	foreign key (Modulo_idModulo) references Modulo(idModulo),
+	foreign key (Curso_idCurso) references Curso(idCurso),
+	primary key (Profesor_NIF, Modulo_idModulo, Curso_idCurso)
+) [42102-214]
+2023-01-26 12:10:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CICLO" not found; SQL statement:
+insert into Ciclo values (1, 'Desarrollo de Software Multiplataforma', 'Superior', 1) [42102-214]
+2023-01-26 12:10:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CURSO" not found; SQL statement:
+insert into Curso values (1, 'Manana', 2, 1) [42102-214]
+2023-01-26 12:10:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MODULO_CURSO" not found; SQL statement:
+insert into Modulo_Curso values (1, 1) [42102-214]
+2023-01-26 12:10:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MODULOS_PROFESOR" not found; SQL statement:
+insert into Modulos_Profesor values (1, 1, 1) [42102-214]
+2023-01-26 12:10:33 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DROP [*]ESPECIALIDAD"; expected "TABLE, INDEX, USER, SEQUENCE, CONSTANT, TRIGGER, VIEW, ROLE, ALIAS, SCHEMA, ALL OBJECTS, DOMAIN, TYPE, DATATYPE, AGGREGATE, SYNONYM"; SQL statement:
+DROP ESPECIALIDAD [42001-214]
+2023-01-26 12:10:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Cannot drop "ESPECIALIDAD" because "CONSTRAINT_F2, CONSTRAINT_87" depends on it; SQL statement:
+DROP TABLE ESPECIALIDAD [90107-214]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:632)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.command.ddl.DropTable.prepareDrop(DropTable.java:97)
+	at org.h2.command.ddl.DropTable.update(DropTable.java:121)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:169)
+	at org.h2.command.Command.executeUpdate(Command.java:252)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:252)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1339)
+	at org.h2.server.web.WebApp.query(WebApp.java:1137)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1103)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1090)
+	at org.h2.server.web.WebThread.process(WebThread.java:188)
+	at org.h2.server.web.WebThread.run(WebThread.java:101)
+	at java.base/java.lang.Thread.run(Thread.java:833)
+2023-01-26 12:10:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Cannot drop "PROFESOR" because "CONSTRAINT_453" depends on it; SQL statement:
+DROP TABLE PROFESOR [90107-214]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:632)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.command.ddl.DropTable.prepareDrop(DropTable.java:97)
+	at org.h2.command.ddl.DropTable.update(DropTable.java:121)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:169)
+	at org.h2.command.Command.executeUpdate(Command.java:252)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:252)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
+	at org.h2.server.web.WebApp.getResult(WebApp.java:1339)
+	at org.h2.server.web.WebApp.query(WebApp.java:1137)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1103)
+	at org.h2.server.web.WebApp$1.next(WebApp.java:1090)
+	at org.h2.server.web.WebThread.process(WebThread.java:188)
+	at org.h2.server.web.WebThread.run(WebThread.java:101)
+	at java.base/java.lang.Thread.run(Thread.java:833)
