@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ import javax.swing.table.DefaultTableModel;
  * @author Anima
  */
 public class PantallaCRUD extends javax.swing.JFrame {
-    //QUITAR EL AUTO_INCREMENT
+
     private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
     DefaultTableModel dtm = new DefaultTableModel();
     List<Class> listaClases = new ArrayList();
@@ -73,20 +74,20 @@ public class PantallaCRUD extends javax.swing.JFrame {
         //Makes the primary key rows uneditable
         //Sets the images
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG4.png"
-                , PantallaLogIn.labelIntoJPanel(jPanel1));
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG4.png",
+                 PantallaLogIn.labelIntoJPanel(jPanel1));
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\saveButton.png"
-                , botonSave);
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\saveButton.png",
+                 botonSave);
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\cancelBoton.png"
-                , botonCancel);
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\cancelBoton.png",
+                 botonCancel);
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\addBoton.png"
-                , botonCreate);
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\addBoton.png",
+                 botonCreate);
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\deleteBoton.png"
-                , botonDelete);
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\deleteBoton.png",
+                 botonDelete);
     }
 
     private Object objectInstance(Class clazz) {
@@ -131,7 +132,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
             }
         }
     }
-    
+
     private void fixedClassesToArrayList() {
         listaClases.add(0, Especialidad.class);
         listaClases.add(1, Profesor.class);
@@ -524,17 +525,30 @@ public class PantallaCRUD extends javax.swing.JFrame {
                     em.flush();
                     em.getTransaction().commit();
                 }
-            }catch(Exception e) {
+            } catch (Exception e) {
                 Toolkit.getDefaultToolkit().beep();
-                JOptionPane.showMessageDialog(null, "Datos incorrectos."
-                    , "Error de inserción", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Datos incorrectos.",
+                         "Error de inserción", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
-            List listaClase = extractDBData(key);
-            for (Object object : listaClase) {
+        }
+
+        LinkedHashMap<Class, List> inversedArrayLists = new LinkedHashMap();
+        List<Map.Entry<Class, List>> lista = new ArrayList(arrayLists.entrySet());
+        Collections.reverse(lista);
+        for (Map.Entry<Class, List> entry : lista) {
+            inversedArrayLists.put(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<Class, List> entry : inversedArrayLists.entrySet()) {
+            EntityManager em = emf.createEntityManager();
+            Class key = entry.getKey();
+            List listaActual = entry.getValue();
+            List listaClaseDB = extractDBData(key);
+            for (Object objectDB : listaClaseDB) {
                 boolean isInList = false;
                 //The code iterate through the database and for each object it get its id
-                Object idObjectDB = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(object);
+                Object idObjectDB = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(objectDB);
                 for (Object objetoApp : listaActual) {
                     //The code iterate through the arrayList lists and for each object it get its id
                     Object idObjetoApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(objetoApp);
@@ -549,16 +563,19 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 if (!isInList) {
                     try {
                         em.getTransaction().begin();
-                        em.remove(em.merge(object));
+                        em.remove(em.merge(objectDB));
                         em.getTransaction().commit();
                     } catch (Exception e) {
+                        Toolkit.getDefaultToolkit().beep();
+                        JOptionPane.showMessageDialog(null, "Está intentando borrar una columna"
+                                + " referenciado en otra tabla. No se puede realizar esa operación.",
+                                 "Error de borrado de columna.", JOptionPane.ERROR_MESSAGE);
                         e.printStackTrace();
                     }
                 }
             }
             em.close();
         }
-
         PantallaCRUD screenCRUD = new PantallaCRUD();
         this.dispose();
         screenCRUD.setVisible(true);
