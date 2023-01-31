@@ -34,6 +34,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -46,9 +47,9 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     //QUITAR EL AUTO_INCREMENT
     private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
     DefaultTableModel dtm = new DefaultTableModel();
-    List<Class> listaClases = new ArrayList();
+    List<String> listaTurnos = new ArrayList();
     Class ultimaClase;
-    LinkedHashMap<Class, List> arrayLists = new LinkedHashMap<>();
+    LinkedHashMap<String, List> arrayLists = new LinkedHashMap<>();
 
     /**
      * Creates new form PantallaPrincipal
@@ -103,70 +104,32 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         }
         return instance;
     }
-
-    //Method that stores all the classes in a list for its use.
-    private void classesToArrayList() {
-        // package name with all the classes
-        String packageName = "danielCastro.schoolschedule.dao";
-        // Get the package URL
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        URL packageURL = classLoader.getResource(packageName.replace(".", "/"));
-
-        //Get all files in the package
-        File packageDir = new File(packageURL.getFile());
-        File[] files = packageDir.listFiles();
-        //Goes over all the class files in the package
-        for (File file : files) {
-            if (file.isFile() && file.getName().endsWith(".class")) {
-                //Gets the class name, getting rid of the .class extension
-                String className = packageName + "." + file.getName().substring(0, file.getName().length() - 6);
-                try {
-                    //Creates the class and adds it to the list
-                    Class<?> clazz = Class.forName(className);
-                    listaClases.add(clazz);
-                    jComboTabla.addItem(clazz.getSimpleName());
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(PantallaSeleccion.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
     
     private void fixedClassesToArrayList() {
-        listaClases.add(0, Especialidad.class);
-        listaClases.add(1, Profesor.class);
-        listaClases.add(2, Modulo.class);
-        listaClases.add(3, Ciclo.class);
-        listaClases.add(4, Curso.class);
-        listaClases.add(5, Modulo_Curso.class);
-        listaClases.add(6, Modulo_Profesor.class);
-        listaClases.add(7, Login.class);
-        jComboTabla.addItem("Especialidad");
-        jComboTabla.addItem("Profesor");
-        jComboTabla.addItem("Modulo");
-        jComboTabla.addItem("Ciclo");
-        jComboTabla.addItem("Curso");
-        jComboTabla.addItem("Modulo_Curso");
-        jComboTabla.addItem("Modulo_Profesor");
-        jComboTabla.addItem("Login");
+        jComboTabla.addItem("Magnana");
+        jComboTabla.addItem("Tarde");
+        jComboTabla.addItem("Noche");
+        for (int i = 0; i < jComboTabla.getItemCount(); i++) {
+            listaTurnos.add(jComboTabla.getItemAt(i));
+        }
     }
 
     //Method that creates a list for each class to store the DB info
     private void createArrayLists() {
         //Fills the map with empty ArrayLists
-        for (Class clazz : listaClases) {
+        for (String str : listaTurnos) {
             List arrayList = new ArrayList();
-            arrayLists.put(clazz, arrayList);
+            arrayLists.put(str, arrayList);
         }
         //Populates the ArrayLists with the data from the DB
-        for (Class clazz : listaClases) {
-            arrayLists.get(clazz).addAll(extractDBData(clazz));
+        for (String str : listaTurnos) {
+            arrayLists.get(str).addAll(extractDBData(str));
         }
         //Initializes the table to display a class info from the start of the app
-        for (Class clazz : listaClases) {
-            if (clazz.getSimpleName().equals(jComboTabla.getSelectedItem())) {
-                updateTable(clazz, false);
-                uneditablePK(ultimaClase);
+        for (String str : listaTurnos) {
+            if (str.equals(jComboTabla.getSelectedItem())) {
+                //updateTable(str, false);
+                //uneditablePK(ultimaClase);
                 break;
             }
         }
@@ -174,15 +137,26 @@ public class PantallaSeleccion extends javax.swing.JFrame {
 
     //Method that extracts all the info of the database and stores it into its
     //corresponding list.
-    private List extractDBData(Class clazz) {
+    private List extractDBData(String str) {
         //Selects everything for each class and stores it in listaClase.
         List<Object> listaClase = new ArrayList();
         EntityManager em = emf.createEntityManager();
-        String nombreClase = clazz.getSimpleName();
-        String query = "SELECT p FROM " + nombreClase + " p";
-        TypedQuery tq = em.createQuery(query, clazz);
+        String query = """
+                       SELECT
+                       m.nombre,
+                       cu.idCurso,
+                       m.horasReales
+                       FROM Modulo_Curso AS mc
+                       JOIN mc.curso cu
+                       JOIN mc.modulo m
+                       WHERE cu.turno = 'Manana'
+                       """;
+        
+        Query tq = em.createQuery(query);
+        //tq.setParameter("turnito", str);
         try {
             listaClase = tq.getResultList();
+            System.out.println(listaClase.size() + " " + (String)listaClase.get(0));
         } catch (NoResultException nrex) {
             System.out.println("No se ha encontrado ningún resultado en la BD.");
         } catch (Exception ex) {
@@ -194,7 +168,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     }
 
     //Method that updates the info displaying on the table
-    private void updateTable(Class clazz, Boolean guardar) {
+    private void updateTable(String str, Boolean guardar) {
         //Method that checks if we are changing the current table selected 
         //on the comboBox and saves the changes made to that table on its
         //corresponding list
@@ -205,12 +179,12 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         dtm.setRowCount(0);
         dtm.setColumnCount(0);
         //Sets the header values depending on the class on the parametres
-        Object[] listaAtt = getAttributeNames(clazz).toArray();
+        Object[] listaAtt = getAttributeNames(str).toArray();
         dtm.setColumnIdentifiers(listaAtt);
         //Sets the table model to DefaultTableModel and gets the list that 
         //has the info of the class and its values.
         jTable.setModel(dtm);
-        List listaClase = arrayLists.get(clazz);
+        List listaClase = arrayLists.get(str);
         //Iterates over all the values in the list in order to display them
         //on the table
         for (Object object : listaClase) {
@@ -234,7 +208,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             dtm.addRow(values);
         }
         //I set the 'ultimaClase' variable to the class selected by the user
-        ultimaClase = clazz;
+        ultimaClase = str;
     }
 
     //Method that updates the table when the comboBox value that has the 
@@ -245,7 +219,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             //until it finds the right one
             public void actionPerformed(ActionEvent e) {
                 Object selectedItem = jComboTabla.getSelectedItem();
-                for (Class clazz : listaClases) {
+                for (Class clazz : listaTurnos) {
                     if (clazz.getSimpleName().equals(selectedItem)) {
                         updateTable(clazz, true);
                         uneditablePK(ultimaClase);
@@ -340,12 +314,14 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanelMenu = new javax.swing.JPanel();
         botonCancel = new javax.swing.JButton();
-        botonSave = new javax.swing.JButton();
         jComboTabla = new javax.swing.JComboBox<>();
         jTextField1 = new javax.swing.JTextField();
+        botonSave = new javax.swing.JButton();
         jPanelTable = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable = new javax.swing.JTable();
+        botonCreate = new javax.swing.JButton();
+        botonDelete = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -360,6 +336,8 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             }
         });
 
+        jTextField1.setToolTipText("Filtrar");
+
         botonSave.setBorderPainted(false);
         botonSave.setContentAreaFilled(false);
         botonSave.addActionListener(new java.awt.event.ActionListener() {
@@ -368,38 +346,37 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             }
         });
 
-        jTextField1.setToolTipText("Filtrar");
-
         javax.swing.GroupLayout jPanelMenuLayout = new javax.swing.GroupLayout(jPanelMenu);
         jPanelMenu.setLayout(jPanelMenuLayout);
         jPanelMenuLayout.setHorizontalGroup(
             jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelMenuLayout.createSequentialGroup()
-                .addGap(37, 37, 37)
+                .addGap(35, 35, 35)
                 .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(170, 170, 170)
+                .addGap(73, 73, 73)
                 .addComponent(jComboTabla, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(136, 136, 136)
+                .addGap(58, 58, 58)
                 .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
-                .addGap(122, 122, 122)
+                .addGap(66, 66, 66)
                 .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35))
+                .addGap(268, 268, 268))
         );
         jPanelMenuLayout.setVerticalGroup(
             jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelMenuLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
                 .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanelMenuLayout.createSequentialGroup()
-                        .addContainerGap()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelMenuLayout.createSequentialGroup()
+                        .addGap(45, 45, 45)
                         .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jComboTabla)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelMenuLayout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(19, Short.MAX_VALUE))
+                    .addGroup(jPanelMenuLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(25, 25, 25))
         );
 
         jPanelTable.setOpaque(false);
@@ -417,7 +394,21 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable);
 
-        jLabel1.setText("jLabel1");
+        botonCreate.setBorderPainted(false);
+        botonCreate.setContentAreaFilled(false);
+        botonCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonCreateActionPerformed(evt);
+            }
+        });
+
+        botonDelete.setBorderPainted(false);
+        botonDelete.setContentAreaFilled(false);
+        botonDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonDeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelTableLayout = new javax.swing.GroupLayout(jPanelTable);
         jPanelTable.setLayout(jPanelTableLayout);
@@ -425,10 +416,18 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelTableLayout.createSequentialGroup()
                 .addContainerGap(34, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 725, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(102, 102, 102)
-                .addComponent(jLabel1)
-                .addGap(102, 102, 102))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanelTableLayout.createSequentialGroup()
+                        .addGap(49, 49, 49)
+                        .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(48, 48, 48))
+                    .addGroup(jPanelTableLayout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22))))
         );
         jPanelTableLayout.setVerticalGroup(
             jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -437,9 +436,13 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                     .addGroup(jPanelTableLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 510, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelTableLayout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addComponent(jLabel1)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelTableLayout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addGroup(jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(63, 63, 63)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 369, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
 
@@ -485,71 +488,16 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         pli.setVisible(true);
     }//GEN-LAST:event_botonCancelActionPerformed
 
+    private void botonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCreateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_botonCreateActionPerformed
+
+    private void botonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonDeleteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_botonDeleteActionPerformed
+
     private void botonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonSaveActionPerformed
         // TODO add your handling code here:
-        //Saves the values on the current table in its corresponding arrayLists list
-        guardarValores(ultimaClase);
-
-        //This code iterates through all of the lists in arrayLists
-        for (Map.Entry<Class, List> entry : arrayLists.entrySet()) {
-            EntityManager em = emf.createEntityManager();
-            Class key = entry.getKey();
-            List listaActual = entry.getValue();
-
-            //If the object needs to be created or updated, it is merged on
-            //the database and then flushed to execute the update.
-            try {
-                for (int i = 0; i < listaActual.size(); i++) {
-                    Object appObj = listaActual.get(i);
-                    Object idApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(appObj);
-                    Object objetoDB = em.find(key, idApp);
-                    em.getTransaction().begin();
-                    objetoDB = em.merge(appObj);
-                    em.flush();
-                    em.getTransaction().commit();
-                }
-            }catch(Exception e) {
-                Toolkit.getDefaultToolkit().beep();
-                JOptionPane.showMessageDialog(null, "Datos incorrectos."
-                    , "Error de inserción", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
-            }
-            List listaClase = extractDBData(key);
-            for (Object object : listaClase) {
-                boolean isInList = false;
-                //The code iterate through the database and for each object it get its id
-                Object idObjectDB = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(object);
-                for (Object objetoApp : listaActual) {
-                    //The code iterate through the arrayList lists and for each object it get its id
-                    Object idObjetoApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(objetoApp);
-                    //This snippet compares both ids, if both are the same, we know the
-                    //object from the database is in the last, then it won't be removed
-                    //if it is not, that means it was removed
-                    if (idObjectDB == idObjetoApp) {
-                        isInList = true;
-                        break;
-                    }
-                }
-                if (!isInList) {
-                    try {
-                        em.getTransaction().begin();
-                        em.remove(em.merge(object));
-                        em.getTransaction().commit();
-                    } catch (Exception e) {
-                        Toolkit.getDefaultToolkit().beep();
-                        JOptionPane.showMessageDialog(null, "Está intentando borrar una columna"
-                                + " referenciado en otra tabla. No se puede realizar esa operación."
-                            , "Error de borrado de columna.", JOptionPane.ERROR_MESSAGE);
-                        e.printStackTrace();
-                    }
-                }
-            }
-            em.close();
-        }
-
-        PantallaSeleccion screenCRUD = new PantallaSeleccion();
-        this.dispose();
-        screenCRUD.setVisible(true);
     }//GEN-LAST:event_botonSaveActionPerformed
 
     /**
@@ -588,6 +536,8 @@ public class PantallaSeleccion extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonCancel;
+    private javax.swing.JButton botonCreate;
+    private javax.swing.JButton botonDelete;
     private javax.swing.JButton botonSave;
     private javax.swing.JComboBox<String> jComboTabla;
     private javax.swing.JLabel jLabel1;

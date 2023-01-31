@@ -37,11 +37,11 @@ public class Curso {
         this.idCiclo = idCiclo;
     }
 
-    public int getIdcurso() {
+    public int getIdCurso() {
         return idCurso;
     }
 
-    public void setIdcurso(int idcurso) {
+    public void setIdCurso(int idcurso) {
         this.idCurso = idcurso;
     }
 

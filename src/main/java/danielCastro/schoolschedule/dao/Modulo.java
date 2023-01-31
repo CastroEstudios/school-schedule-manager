@@ -1,5 +1,6 @@
 package danielCastro.schoolschedule.dao;
 
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -7,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "MODULO")
-public class Modulo {
+public class Modulo implements Serializable {
     
     @Id
     @Column(name = "IDMODULO")
@@ -35,11 +36,11 @@ public class Modulo {
         this.idEspecialidad = especialidad;
     }
 
-    public int getIdmodulo() {
+    public int getIdModulo() {
         return idModulo;
     }
 
-    public void setIdmodulo(int idmodulo) {
+    public void setIdModulo(int idmodulo) {
         this.idModulo = idmodulo;
     }
 

@@ -6,9 +6,9 @@ package danielCastro.schoolschedule.dao;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -20,48 +20,53 @@ import javax.persistence.Table;
 public class Modulo_Curso implements Serializable {
     
     @Id
-    @Column(name = "MODULO_IDMODULO")
-    private int idModulo;
+    @ManyToOne
+    private Curso curso;
     @Id
-    @Column(name = "CURSO_IDCURSO")
-    private int idCurso;
+    @ManyToOne
+    private Modulo modulo;
 
     public Modulo_Curso() {
     }
 
-    public Modulo_Curso(int idModulo, int idCurso) {
-        this.idModulo = idModulo;
-        this.idCurso = idCurso;
+    public Modulo_Curso(Curso curso, Modulo modulo) {
+        this.curso = curso;
+        this.modulo = modulo;
     }
 
-    public int getIdModulo() {
-        return idModulo;
+    public Curso getCurso() {
+        return curso;
     }
 
-    public void setIdModulo(int idModulo) {
-        this.idModulo = idModulo;
+    public void setCurso(Curso curso) {
+        this.curso = curso;
     }
 
-    public int getIdCurso() {
-        return idCurso;
+    public Modulo getModulo() {
+        return modulo;
     }
 
-    public void setIdCurso(int idCurso) {
-        this.idCurso = idCurso;
+    public void setModulo(Modulo modulo) {
+        this.modulo = modulo;
     }
 
+    @Override
+    public String toString() {
+        return "Modulo_Curso{" + "curso=" + curso + ", modulo=" + modulo + '}';
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || this.getClass() != obj.getClass()) return false;
         Modulo_Curso parametreObject = (Modulo_Curso) obj;
-        return this.getIdModulo() == parametreObject.getIdModulo() 
-                && this.getIdCurso() == parametreObject.getIdCurso();
+        return modulo.getIdModulo() == parametreObject.getModulo().getIdModulo()
+                && curso.getIdCurso() == parametreObject.getCurso().getIdCurso();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idModulo, idCurso);
+        return Objects.hash(modulo.getIdModulo(), curso.getIdCurso());
     }
 
 }
