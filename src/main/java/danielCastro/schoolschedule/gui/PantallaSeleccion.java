@@ -5,28 +5,16 @@
 package danielCastro.schoolschedule.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import danielCastro.schoolschedule.dao.Ciclo;
-import danielCastro.schoolschedule.dao.Curso;
-import danielCastro.schoolschedule.dao.Especialidad;
-import danielCastro.schoolschedule.dao.Login;
-import danielCastro.schoolschedule.dao.Modulo;
-import danielCastro.schoolschedule.dao.Modulo_Curso;
-import danielCastro.schoolschedule.dao.Modulo_Profesor;
-import danielCastro.schoolschedule.dao.Profesor;
 import danielCastro.schoolschedule.util.CustomTableHeader;
 import java.awt.Color;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -35,8 +23,6 @@ import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -149,11 +135,10 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                        FROM Modulo_Curso AS mc
                        JOIN mc.curso cu
                        JOIN mc.modulo m
-                       WHERE cu.turno = 'Manana'
-                       """;
+                       WHERE cu.turno = 
+                       """ + "'" + str + "'";
         
         Query tq = em.createQuery(query);
-        //tq.setParameter("turnito", str);
         try {
             listaClase = tq.getResultList();
             System.out.println(listaClase.size() + " " + (String)listaClase.get(0));
