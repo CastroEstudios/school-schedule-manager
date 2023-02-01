@@ -364,6 +364,10 @@ public class PantallaLogIn extends javax.swing.JFrame {
                 PantallaCRUD pp = new PantallaCRUD();
                 this.dispose();
                 pp.setVisible(true);
+            }else if(login.getPermisos().equals("Profesor")) {
+                PantallaSeleccion ps = new PantallaSeleccion();
+                this.dispose();
+                ps.setVisible(true);
             }
         }catch (NoResultException nrex) {
             Toolkit.getDefaultToolkit().beep();

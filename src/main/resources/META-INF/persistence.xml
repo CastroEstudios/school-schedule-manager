@@ -6,11 +6,17 @@
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>danielCastro.schoolschedule.dao.Profesor</class>
     <class>danielCastro.schoolschedule.dao.Login</class>
-    <class>danielCastro.schoolschedule.dao.Especialidad</class>
+    <class>danielCastro.schoolschedule.dao.Ciclo</class>
+    <class>dadanielCastro.schoolschedule.dao.Curso</class>
+    <class>dadanielCastro.schoolschedule.dao.Modulo</class>
+    <class>ddanielCastro.schoolschedule.dao.Modulo_Curso</class>
+    <class>dadanielCastro.schoolschedule.dao.Modulo_Profesor</class>
+    <class>ddanielCastro.schoolschedule.dao.Especialidad</class>
     <properties>
-      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:./h2/bd/cesarManrique"/>
-      <property name="javax.persistence.jdbc.user" value="sa"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
+      <property name="javax.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/cesarmanrique"/>
+      <property name="javax.persistence.jdbc.user" value="root"/>
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="hibernate.show_sql" value="true"/>
       <property name="format_sql" value="true"/>

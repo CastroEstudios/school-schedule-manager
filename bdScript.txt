@@ -32,7 +32,7 @@ create table Ciclo (
 );
 
 create table Curso (
-	idCurso int not null primary key,
+	idCurso char(6) not null primary key,
 	Turno enum ('Manana', 'Tarde', 'Noche') default 'Manana' not null,
 	Nivel tinyint not null,
 	Ciclo_idCiclo int not null,
@@ -41,7 +41,7 @@ create table Curso (
 
 create table Modulo_Curso (
 	Modulo_idModulo int not null,
-	Curso_idCurso int not null,
+	Curso_idCurso char(6) not null,
 	foreign key (Modulo_idModulo) references Modulo(idModulo),
 	foreign key (Curso_idCurso) references Curso(idCurso),
 	primary key(Curso_idCurso, Modulo_idModulo)
@@ -50,7 +50,7 @@ create table Modulo_Curso (
 create table Modulos_Profesor (
 	Profesor_NIF char(9) not null,
 	Modulo_idModulo int not null,
-	Curso_idCurso int not null,
+	Curso_idCurso char(6) not null,
 	foreign key (Profesor_NIF) references Profesor(NIF),
 	foreign key (Modulo_idModulo) references Modulo(idModulo),
 	foreign key (Curso_idCurso) references Curso(idCurso),
@@ -64,15 +64,52 @@ create table Login (
 	foreign key (Profesor_NIF) references Profesor(NIF) 
 );
 
-insert into Especialidad values ('0', '');
-insert into Profesor values ('SA0000000', 'SA', 'SA', '0', '0', '0');
-INSERT INTO LOGIN VALUES ('SA0000000', 'SA', '1234');
-insert into Especialidad values (1, 'Ciencias de la Información');
-insert into Profesor (Nombre, Apellidos, Antiguedad, HorasContratadas
-	, Especialidad_idEspecialidad) values ('Wilfredo', 'Wilfredo', '4850', 25, 1);
-insert into Ciclo values (1, 'Desarrollo de Software Multiplataforma', 'Superior', 1);
-insert into Curso values (1, 'Manana', 2, 1);
-insert into Modulo values (1, 'Acceso a Datos', 7, 6, 'Hacemos cositas', 1);
-insert into Modulo_Curso values (1, 1);
-insert into Modulos_Profesor values (1, 1, 1);
-insert into login values ('SA0000000', 'SA', '1234');
+INSERT INTO Especialidad (idEspecialidad, Nombre)
+VALUES 
+  (1, 'Informática'),
+  (2, 'Matemáticas'),
+  (3, 'Física'),
+  (4, 'Química');
+
+INSERT INTO Profesor (NIF, Nombre, Apellidos, Antiguedad, HorasContratadas, Especialidad_idEspecialidad)
+VALUES 
+  ('123456789', 'John', 'Doe', 5, 20, 1),
+  ('987654321', 'Jane', 'Doe', 8, 30, 2),
+  ('121212121', 'Sarah', 'Smith', 10, 40, 3),
+  ('212121212', 'Michael', 'Johnson', 12, 50, 4);
+
+INSERT INTO Modulo (idModulo, Nombre, HorasReales, HorasPonderadas, Descripcion, Especialidad_idEspecialidad)
+VALUES 
+  (1, 'Programación', 50, 80, 'Modulo de programacion', 1),
+  (2, 'Calculo', 40, 60, 'Modulo de calculo', 2),
+  (3, 'Mecánica', 30, 50, 'Modulo de mecanica', 3),
+  (4, 'Química Orgánica', 20, 40, 'Modulo de quimica organica', 4);
+
+INSERT INTO Ciclo (idCiclo, Nombre, Nivel, Especialidad_idEspecialidad)
+VALUES 
+  (1, 'Ciclo Grado Superior', 'Superior', 1),
+  (2, 'Ciclo Grado Medio', 'Medio', 2),
+  (3, 'Ciclo Formación Profesional', 'Básico', 3),
+  (4, 'Ciclo Grado Superior', 'Superior', 4);
+
+INSERT INTO Curso (idCurso, Turno, Nivel, Ciclo_idCiclo)
+VALUES 
+  ('A00011', 'Manana', 1, 1),
+  ('B00011', 'Tarde', 2, 2),
+  ('C00011', 'Noche', 3, 3),
+  ('D00011', 'Manana', 4, 4);
+
+INSERT INTO Modulo_Curso (Modulo_idModulo, Curso_idCurso)
+VALUES 
+  (1, 'A00011'),
+  (2, 'B00011'),
+  (3, 'C00011'),
+  (4, 'D00011');
+
+INSERT INTO Login (Profesor_NIF, Permisos, Clave)
+VALUES 
+  ('123456789', 'Profesor', 'password1'),
+  ('987654321', 'SA', '1234');
+
+
+
