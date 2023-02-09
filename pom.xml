@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>danielCastro</groupId>
-    <artifactId>Final_Project</artifactId>
+    <artifactId>danielCastro-proyectoFinal</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -42,5 +42,5 @@
             <version>3.0</version>
         </dependency>
     </dependencies>
-
+    <name>danielCastro-proyectoFinal</name>
 </project>

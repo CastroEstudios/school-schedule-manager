@@ -39,4 +39,13 @@ public class Especialidad implements Serializable {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Especialidad parametreObject = (Especialidad) obj;
+        return this.getIdEspecialidad() == parametreObject.getIdEspecialidad();
+    }
+    
 }

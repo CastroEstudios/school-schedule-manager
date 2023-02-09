@@ -4,6 +4,7 @@
  */
 package danielCastro.schoolschedule.dao;
 
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +16,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "CURSO")
-public class Curso {
+public class Curso implements Serializable {
     
     @Id
     @Column(name = "IDCURSO")
@@ -69,5 +70,12 @@ public class Curso {
         this.idCiclo = idCiclo;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Curso parametreObject = (Curso) obj;
+        return this.getIdcurso().equals(parametreObject.getIdcurso());
+    }
     
 }

@@ -56,7 +56,7 @@ public class Modulo_Curso implements Serializable {
         if (obj == null || this.getClass() != obj.getClass()) return false;
         Modulo_Curso parametreObject = (Modulo_Curso) obj;
         return this.getIdModulo() == parametreObject.getIdModulo() 
-                && this.getIdCurso() == parametreObject.getIdCurso();
+                && this.getIdCurso().equals(parametreObject.getIdCurso());
     }
 
     @Override

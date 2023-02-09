@@ -88,4 +88,12 @@ public class Modulo implements Serializable {
         return descripcion;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Modulo parametreObject = (Modulo) obj;
+        return this.getIdModulo() == parametreObject.getIdModulo();
+    }
+    
 }

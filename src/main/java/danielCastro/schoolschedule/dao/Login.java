@@ -16,7 +16,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table (name = "Login")
-public class Login {
+public class Login implements Serializable {
     
     @Id
     @Column(name = "PROFESOR_NIF")
@@ -60,4 +60,12 @@ public class Login {
         return profesor_nif + " | " + permisos + " | " +  clave;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Login parametreObject = (Login) obj;
+        return this.getProfesor_nif().equals(parametreObject.getProfesor_nif());
+    }
+    
 }

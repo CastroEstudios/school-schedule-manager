@@ -82,4 +82,13 @@ public class Profesor {
     public void setIdEspecialidad(int idEspecialidad) {
         this.idEspecialidad = idEspecialidad;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Profesor parametreObject = (Profesor) obj;
+        return this.getNif().equals(parametreObject.getNif());
+    }
+    
 }

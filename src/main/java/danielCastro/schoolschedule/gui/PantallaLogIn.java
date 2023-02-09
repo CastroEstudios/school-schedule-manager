@@ -49,8 +49,8 @@ public class PantallaLogIn extends javax.swing.JFrame {
         styles();
         addBGImages();
         randomImg(labelIntoJPanel(jPanelImg));
-        initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG15.png", labelIntoJPanel(jPanelImg));
-        initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG8.png", labelIntoJPanel(jPanelMain));
+        initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG15-2.png", labelIntoJPanel(jPanelImg));
+        initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG18.png", labelIntoJPanel(jPanelMain));
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\userIcon.png", jLabelUser);
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\pswKey.png", jLabelPsw);
     }
@@ -365,7 +365,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
                 this.dispose();
                 pp.setVisible(true);
             }else if(login.getPermisos().equals("Profesor")) {
-                PantallaSeleccion ps = new PantallaSeleccion();
+                PantallaSeleccion ps = new PantallaSeleccion(nif);
                 this.dispose();
                 ps.setVisible(true);
             }

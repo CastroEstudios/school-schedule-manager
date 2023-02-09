@@ -19,25 +19,23 @@ import javax.persistence.Table;
 @Table(name = "MODULOS_PROFESOR")
 public class Modulo_Profesor implements Serializable {
     
-    @Id
     @Column(name = "PROFESOR_NIF")
     private String profesor_nif;
     @Id
     @Column(name = "MODULO_IDMODULO")
     private int idModulo;
-    @Id
     @Column(name = "CURSO_IDCURSO")
-    private int idCurso;
+    private String idCurso;
 
     public Modulo_Profesor() {
     }
 
-    public Modulo_Profesor(String profesor_nif, int idModulo, int idCurso) {
+    public Modulo_Profesor(String profesor_nif, int idModulo, String idCurso) {
         this.profesor_nif = profesor_nif;
         this.idModulo = idModulo;
         this.idCurso = idCurso;
     }
-
+    
     public String getProfesor_nif() {
         return profesor_nif;
     }
@@ -54,11 +52,11 @@ public class Modulo_Profesor implements Serializable {
         this.idModulo = idModulo;
     }
 
-    public int getIdCurso() {
+    public String getIdCurso() {
         return idCurso;
     }
 
-    public void setIdCurso(int idCurso) {
+    public void setIdCurso(String idCurso) {
         this.idCurso = idCurso;
     }
     
@@ -68,7 +66,7 @@ public class Modulo_Profesor implements Serializable {
         if (obj == null || this.getClass() != obj.getClass()) return false;
         Modulo_Profesor parametreObject = (Modulo_Profesor) obj;
         return this.getIdModulo() == parametreObject.getIdModulo() 
-                && this.getIdCurso() == parametreObject.getIdCurso()
+                && this.getIdCurso().equals(parametreObject.getIdCurso())
                 && this.getProfesor_nif().equals(parametreObject.getProfesor_nif());
     }
 

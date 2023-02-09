@@ -70,6 +70,12 @@ public class Ciclo {
         this.idEspecialidad = idEspecialidad;
     }
     
-    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Ciclo parametreObject = (Ciclo) obj;
+        return this.getIdCiclo() == parametreObject.getIdCiclo();
+    }    
     
 }
