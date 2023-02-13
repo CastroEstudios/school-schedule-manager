@@ -1,68 +1,3 @@
-CREATE TABLE Especialidad (
-    idEspecialidad SMALLINT NOT NULL PRIMARY KEY,
-    Nombre VARCHAR(100) NOT NULL
-);
-
-create table Profesor (
-	NIF CHAR(9) not null primary key,
-	Nombre varchar(45) not null,
-	Apellidos varchar(100) not null,
-	Antiguedad smallint not null,
-	HorasContratadas smallint not null,
-	Especialidad_idEspecialidad smallint not null,
-	foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)
-);
-
-create table Modulo (
-	idModulo int not null primary key,
-	Nombre varchar(45) not null,
-	HorasReales smallint not null,
-	HorasPonderadas smallint not null,
-	Descripcion varchar(200),
-	Especialidad_idEspecialidad smallint not null,
-	foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)
-);
-
-create table Ciclo (
-	idCiclo int not null primary key,
-	Nombre varchar(45) not null,
-	Nivel enum ('Básico', 'Medio', 'Superior') default 'Medio' not null,
-	Especialidad_idEspecialidad smallint not null,
-	foreign key (Especialidad_idEspecialidad) references Especialidad(idEspecialidad)
-);
-
-create table Curso (
-	idCurso char(6) not null primary key,
-	Turno enum ('Manana', 'Tarde', 'Noche') default 'Manana' not null,
-	Nivel tinyint not null,
-	Ciclo_idCiclo int not null,
-	foreign key (Ciclo_idCiclo) references Ciclo(idCiclo)
-);
-
-create table Modulo_Curso (
-	Modulo_idModulo int not null,
-	Curso_idCurso char(6) not null,
-	foreign key (Modulo_idModulo) references Modulo(idModulo),
-	foreign key (Curso_idCurso) references Curso(idCurso),
-	primary key(Curso_idCurso, Modulo_idModulo)
-);
-
-create table Modulos_Profesor (
-	Profesor_NIF char(9) not null,
-	Modulo_idModulo int not null,
-	Curso_idCurso char(6) not null,
-	foreign key (Profesor_NIF) references Profesor(NIF),
-	foreign key (Modulo_idModulo) references Modulo(idModulo),
-	foreign key (Curso_idCurso) references Curso(idCurso),
-	primary key (Profesor_NIF, Modulo_idModulo, Curso_idCurso)
-);
-
-create table Login (
-	Profesor_NIF char(9) not null primary key,
-	Permisos varchar(20) check (Permisos in ('SA', 'Profesor')),
-	Clave varchar(50) not null,
-	foreign key (Profesor_NIF) references Profesor(NIF) 
-);
 
 INSERT INTO Especialidad (idEspecialidad, Nombre)
 VALUES 
@@ -397,6 +332,3 @@ VALUES
   ('11111111C', 'Profesor', '1234'),
   ('11111111D', 'Profesor', '1234'),
   ('99999999A', 'SA', '1234');
-
-
-

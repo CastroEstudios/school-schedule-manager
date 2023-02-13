@@ -19,11 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javax.imageio.ImageIO;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -32,14 +27,21 @@ import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import org.neodatis.odb.ODB;
+import org.neodatis.odb.ODBFactory;
+import org.neodatis.odb.Objects;
+import org.neodatis.odb.core.query.IQuery;
+import org.neodatis.odb.core.query.criteria.Where;
+import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
  *
  * @author Anima
  */
 public class PantallaLogIn extends javax.swing.JFrame {
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
     List<String> imagePaths = new ArrayList<>();
+    File fileDB = new File("cesarManrique.db");
+    ODB odb = null;
     /**
      * Creates new form PantallaLogIn
      */
@@ -53,6 +55,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG18.png", labelIntoJPanel(jPanelMain));
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\userIcon.png", jLabelUser);
         initBGImage(".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\pswKey.png", jLabelPsw);
+        this.odb = initODB(odb, fileDB);
     }
     
     //It sets the styles of the JComponents
@@ -69,9 +72,9 @@ public class PantallaLogIn extends javax.swing.JFrame {
         jPanelMain.setBackground(Color.decode("#a2c7de"));
         
         jBotonLog.putClientProperty("JButton.buttonType","roundRect");
-        jBotonClear.putClientProperty("JButton.buttonType","roundRect");
+        botonDatosPrueba.putClientProperty("JButton.buttonType","roundRect");
         jBotonLog.setBackground(Color.decode("#6e8a89"));
-        jBotonClear.setBackground(Color.decode("#6e8a89"));
+        botonDatosPrueba.setBackground(Color.decode("#6e8a89"));
     }
     
     //This method picks up all the tenerifex.png images and puts them into a list.
@@ -126,6 +129,11 @@ public class PantallaLogIn extends javax.swing.JFrame {
         label.setBounds(0, 0, panel.getWidth(), panel.getHeight());
         return label;
     }
+
+    public static ODB initODB(ODB odb, File file) {
+        odb = ODBFactory.open(file.getName(), "root", "");  
+        return odb;
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -151,7 +159,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
         jPanelImg = new javax.swing.JPanel();
         jPanelBotones = new javax.swing.JPanel();
         jBotonLog = new javax.swing.JButton();
-        jBotonClear = new javax.swing.JButton();
+        botonDatosPrueba = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -277,11 +285,11 @@ public class PantallaLogIn extends javax.swing.JFrame {
             }
         });
 
-        jBotonClear.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 18)); // NOI18N
-        jBotonClear.setText("Limpiar Credenciales");
-        jBotonClear.addActionListener(new java.awt.event.ActionListener() {
+        botonDatosPrueba.setFont(new java.awt.Font("Lucida Sans Unicode", 0, 18)); // NOI18N
+        botonDatosPrueba.setText("Cargar Datos de Prueba");
+        botonDatosPrueba.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBotonClearActionPerformed(evt);
+                botonDatosPruebaActionPerformed(evt);
             }
         });
 
@@ -292,7 +300,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelBotonesLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanelBotonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jBotonClear, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botonDatosPrueba, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBotonLog, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(108, 108, 108))
         );
@@ -302,7 +310,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
                 .addGap(31, 31, 31)
                 .addComponent(jBotonLog, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(42, 42, 42)
-                .addComponent(jBotonClear, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(botonDatosPrueba, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(48, Short.MAX_VALUE))
         );
 
@@ -344,48 +352,46 @@ public class PantallaLogIn extends javax.swing.JFrame {
 
     //Validates the user credentials are in the database.
     private void jBotonLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBotonLogActionPerformed
-        // TODO add your handling code here:
+        
         String nif = jTextNIF.getText();
         char[] contrasegna = jTextPassword.getPassword();
         String contrasegnaS = "";
         for (char c : contrasegna) {
             contrasegnaS += c;
         }
-        EntityManager em = emf.createEntityManager();
-        String query = "FROM Login WHERE profesor_nif = :nif"
-                + " AND clave = :clave";
-        TypedQuery<Login> tq = em.createQuery(query, Login.class);
-        tq.setParameter("nif", nif);
-        tq.setParameter("clave", contrasegnaS);
-        Login login;
-        try {
-            login = tq.getSingleResult();
+
+        IQuery query = new CriteriaQuery(Login.class, Where.and().add(Where.equal("profesor_nif", nif))
+                                                           .add(Where.equal("clave", contrasegnaS)));
+        Objects<Login> result = odb.getObjects(query);
+
+        if (result.hasNext()) {
+            Login login = result.next();
             if(login.getPermisos().equals("SA")) {
                 PantallaCRUD pp = new PantallaCRUD();
                 this.dispose();
                 pp.setVisible(true);
-            }else if(login.getPermisos().equals("Profesor")) {
+            } else if(login.getPermisos().equals("Profesor")) {
                 PantallaSeleccion ps = new PantallaSeleccion(nif);
                 this.dispose();
                 ps.setVisible(true);
             }
-        }catch (NoResultException nrex) {
+        } else {
             Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos."
                     , "Error de credenciales", JOptionPane.ERROR_MESSAGE);
-        }catch (Exception ex) {
-            ex.printStackTrace();
-        }finally {
-            em.close();
         }
     }//GEN-LAST:event_jBotonLogActionPerformed
-
+    
     //Clears both the NIF and Password JTextFields.
-    private void jBotonClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBotonClearActionPerformed
+    private void botonDatosPruebaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonDatosPruebaActionPerformed
         // TODO add your handling code here:
-        jTextNIF.setText("");
-        jTextPassword.setText("");
-    }//GEN-LAST:event_jBotonClearActionPerformed
+        if(fileDB.exists()) {
+            fileDB.delete();
+            odb = ODBFactory.open(fileDB.getName(), "root", ""); 
+            //execute script
+            
+        }
+    }//GEN-LAST:event_botonDatosPruebaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -424,7 +430,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBotonClear;
+    private javax.swing.JButton botonDatosPrueba;
     private javax.swing.JButton jBotonLog;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelContra;
