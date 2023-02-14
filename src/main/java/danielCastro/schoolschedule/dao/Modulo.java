@@ -1,27 +1,14 @@
 package danielCastro.schoolschedule.dao;
 
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "MODULO")
 public class Modulo implements Serializable {
     
-    @Id
-    @Column(name = "IDMODULO")
     int idModulo;
-    @Column(name = "NOMBRE")
     String nombre;
-    @Column(name = "HORASREALES")
     int horasReales;
-    @Column(name = "HORASPONDERADAS")
     int horasPonderadas;
-    @Column(name = "DESCRIPCION")
     String descripcion;
-    @Column(name = "ESPECIALIDAD_IDESPECIALIDAD")
     int idEspecialidad;
 
     public Modulo() {

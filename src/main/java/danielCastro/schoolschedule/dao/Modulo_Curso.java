@@ -6,24 +6,10 @@ package danielCastro.schoolschedule.dao;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-/**
- *
- * @author Anima
- */
-@Entity
-@Table(name = "MODULO_CURSO")
 public class Modulo_Curso implements Serializable {
     
-    @Id
-    @Column(name = "MODULO_IDMODULO")
     private int idModulo;
-    @Id
-    @Column(name = "CURSO_IDCURSO")
     private String idCurso;
 
     public Modulo_Curso() {

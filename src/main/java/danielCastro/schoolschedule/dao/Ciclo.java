@@ -4,28 +4,18 @@
  */
 package danielCastro.schoolschedule.dao;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  *
  * @author Anima
  */
 
-@Entity
-@Table(name = "CICLO")
-public class Ciclo {
+public class Ciclo implements Serializable {
     
-    @Id
-    @Column(name = "IDCICLO")
     private int idCiclo;
-    @Column(name = "NOMBRE")
     private String nombre;
-    @Column(name = "NIVEL")
     private String nivel;
-    @Column(name = "ESPECIALIDAD_IDESPECIALIDAD")
     private int idEspecialidad;
 
     public Ciclo() {
