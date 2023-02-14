@@ -5,6 +5,9 @@
 package danielCastro.schoolschedule.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import danielCastro.schoolschedule.dao.Curso;
+import danielCastro.schoolschedule.dao.Modulo;
+import danielCastro.schoolschedule.dao.Modulo_Curso;
 import danielCastro.schoolschedule.dao.Modulo_Profesor;
 import danielCastro.schoolschedule.util.CustomTableHeader;
 import java.awt.Color;
@@ -13,22 +16,21 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.neodatis.odb.ODB;
+import org.neodatis.odb.ODBFactory;
+import org.neodatis.odb.Objects;
+import org.neodatis.odb.core.query.IQuery;
+import org.neodatis.odb.core.query.criteria.Where;
+import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
  *
  * @author Anima
  */
 public class PantallaSeleccion extends javax.swing.JFrame {
-
-    //QUITAR EL AUTO_INCREMENT
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
+    ODB odb = ODBFactory.open(PantallaLogIn.fileDB.getName(), "root", "");
     DefaultTableModel dtm = new DefaultTableModel();
     DefaultTableModel ptm = new DefaultTableModel();
     List<String> listaTurnos = new ArrayList();
@@ -121,39 +123,33 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     private List mainData(String str) {
         //Selects everything for each class and stores it in listaClase.
         List<Object> listaTabla = new ArrayList();
-        EntityManager em = emf.createEntityManager();
-        String query = """
-                       SELECT 
-                       m.nombre,
-                       cu.idCurso,
-                       cu.turno,
-                       m.horasReales
-                       FROM danielCastro.schoolschedule.dao.Curso cu
-                       JOIN danielCastro.schoolschedule.dao.Modulo_Curso mc
-                       ON cu.idCurso = mc.idCurso 
-                       JOIN danielCastro.schoolschedule.dao.Modulo m
-                       ON mc.idModulo = m.idModulo
-                       WHERE cu.turno = :turnito AND mc.idModulo NOT IN (SELECT idModulo FROM danielCastro.schoolschedule.dao.Modulo_Profesor)
-                       """;
-        Query tq = em.createQuery(query);
-        tq.setParameter("turnito", str);
-        try {
-            listaTabla = tq.getResultList();
-        } catch (NoResultException nrex) {
-            System.out.println("No se ha encontrado ningún resultado en la BD.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            em.close();
+        IQuery query = new CriteriaQuery(Curso.class, Where.equal("turno"
+                , jComboTabla.getSelectedItem().toString()));
+        Objects result = odb.getObjects(query);
+        while (result.hasNext()) {
+            Curso cu = (Curso) result.next();
+            query = new CriteriaQuery(Modulo_Curso.class,
+                        Where.equal("idCurso", cu.getIdCurso()));
+            Modulo_Curso mc = (Modulo_Curso) odb.getObjects(query);
+            query = new CriteriaQuery(Modulo.class,
+                        Where.not(Where.equal("idModulo", mc.getIdModulo())));
+            Objects<Modulo> listaModulos = odb.getObjects(query);
+            for (Modulo m : listaModulos) {
+                Object[] row = new Object[]{
+                    m.getNombre(),
+                    cu.getIdCurso(),
+                    cu.getTurno(),
+                    m.getHorasReales()
+                };
+                listaTabla.add(row);
+            }
         }
         return listaTabla;
     }
 
     private List turnTableData() {
         //Selects everything for each class and stores it in listaClase.
-        List<Object> listaTablaSelect = new ArrayList();
-        EntityManager em = emf.createEntityManager();
-        String query = """
+        String query2 = """
                        SELECT 
                        m.nombre,
                        cu.idCurso,
@@ -168,18 +164,30 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                        ON cu.idCurso = mp.idCurso
                        WHERE mp.profesor_nif = :nifProfesor
                        """;
-        Query tq = em.createQuery(query);
-        tq.setParameter("nifProfesor", nifProfesor);
-        try {
-            listaTablaSelect = tq.getResultList();
-        } catch (NoResultException nrex) {
-            System.out.println("No se ha encontrado ningún resultado en la BD.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            em.close();
+        List<Object> listaTabla = new ArrayList();
+        IQuery query = new CriteriaQuery(Modulo_Profesor.class, 
+                Where.equal("profesor_nif", nifProfesor));
+        Objects result = odb.getObjects(query);
+        while (result.hasNext()) {
+            Modulo_Profesor mp = (Modulo_Profesor) result.next();
+            query = new CriteriaQuery(Curso.class,
+                        Where.equal("idCurso", mp.getIdCurso()));
+            Curso cu = (Curso) odb.getObjects(query);
+            query = new CriteriaQuery(Modulo_Profesor.class,
+                        Where.equal("idCurso", cu.getIdCurso()));
+            Modulo_Curso mc = (Modulo_Curso) odb.getObjects(query);
+            query = new CriteriaQuery(Modulo.class,
+                        Where.equal("idModulo", mc.getIdModulo()));
+            Modulo m = (Modulo) odb.getObjects(query);
+            Object[] row = new Object[]{
+                m.getNombre(),
+                cu.getIdCurso(),
+                cu.getTurno(),
+                m.getHorasReales()
+            };
+            listaTabla.add(row);
         }
-        return listaTablaSelect;
+        return listaTabla;
     }
 
     //Method that updates the info displaying on the table

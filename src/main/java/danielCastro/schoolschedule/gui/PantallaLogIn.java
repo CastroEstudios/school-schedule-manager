@@ -46,8 +46,8 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
  */
 public class PantallaLogIn extends javax.swing.JFrame {
     List<String> imagePaths = new ArrayList<>();
-    File fileDB = new File("cesarManrique.db");
-    ODB odb = ODBFactory.open(fileDB.getName(), "root", "");  ;
+    public static File fileDB = new File("cesarManrique.db");
+    ODB odb = ODBFactory.open(fileDB.getName(), "root", "");
     /**
      * Creates new form PantallaLogIn
      */
@@ -366,6 +366,7 @@ public class PantallaLogIn extends javax.swing.JFrame {
 
         if (result.hasNext()) {
             Login login = result.next();
+            odb.close();
             if(login.getPermisos().equals("SA")) {
                 PantallaCRUD pp = new PantallaCRUD();
                 this.dispose();

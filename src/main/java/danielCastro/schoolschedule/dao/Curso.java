@@ -19,18 +19,18 @@ public class Curso implements Serializable {
     public Curso() {
     }
 
-    public Curso(String idcurso, String turno, int nivel, int idCiclo) {
-        this.idCurso = idcurso;
+    public Curso(String idCurso, String turno, int nivel, int idCiclo) {
+        this.idCurso = idCurso;
         this.turno = turno;
         this.nivel = nivel;
         this.idCiclo = idCiclo;
     }
 
-    public String getIdcurso() {
+    public String getIdCurso() {
         return idCurso;
     }
 
-    public void setIdcurso(String idcurso) {
+    public void setIdCurso(String idcurso) {
         this.idCurso = idcurso;
     }
 
@@ -63,7 +63,7 @@ public class Curso implements Serializable {
         if (this == obj) return true;
         if (obj == null || this.getClass() != obj.getClass()) return false;
         Curso parametreObject = (Curso) obj;
-        return this.getIdcurso().equals(parametreObject.getIdcurso());
+        return this.getIdCurso().equals(parametreObject.getIdCurso());
     }
     
 }

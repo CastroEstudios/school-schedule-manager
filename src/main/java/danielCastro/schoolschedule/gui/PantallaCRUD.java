@@ -30,22 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Id;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.neodatis.odb.ODB;
+import org.neodatis.odb.ODBFactory;
+import org.neodatis.odb.Objects;
 
-/**
- *
- * @author Anima
- */
 public class PantallaCRUD extends javax.swing.JFrame {
-
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
+    ODB odb = ODBFactory.open(PantallaLogIn.fileDB.getName(), "root", "");
     DefaultTableModel dtm = new DefaultTableModel();
     List<Class> listaClases = new ArrayList();
     Class ultimaClase;
@@ -167,7 +159,6 @@ public class PantallaCRUD extends javax.swing.JFrame {
         for (Class clazz : listaClases) {
             if (clazz.getSimpleName().equals(jComboTabla.getSelectedItem())) {
                 updateTable(clazz, false);
-                uneditablePK(ultimaClase);
                 break;
             }
         }
@@ -175,21 +166,13 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     //Method that extracts all the info of the database and stores it into its
     //corresponding list.
-    private List extractDBData(Class clazz) {
+    private <T> List<T> extractDBData(Class<T> clazz) {
         //Selects everything for each class and stores it in listaClase.
-        List<Object> listaClase = new ArrayList();
-        EntityManager em = emf.createEntityManager();
-        String nombreClase = clazz.getSimpleName();
-        String query = "SELECT p FROM " + nombreClase + " p";
-        TypedQuery tq = em.createQuery(query, clazz);
-        try {
-            listaClase = tq.getResultList();
-        } catch (NoResultException nrex) {
-            System.out.println("No se ha encontrado ningún resultado en la BD.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            em.close();
+        List<T> listaClase = new ArrayList();
+        Objects<T> result = odb.getObjects(clazz);
+        if (result.hasNext()) {
+            listaClase.add(result.next());
+            odb.close();
         }
         return listaClase;
     }
@@ -249,31 +232,11 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 for (Class clazz : listaClases) {
                     if (clazz.getSimpleName().equals(selectedItem)) {
                         updateTable(clazz, true);
-                        uneditablePK(ultimaClase);
                         break;
                     }
                 }
             }
         });
-    }
-
-    private void uneditablePK(Class clazz) {
-        Field[] fields = clazz.getDeclaredFields();
-        List<Field> idFields = new ArrayList();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Id.class)) {
-                idFields.add(field);
-            }
-        }
-//        jTable.setDefaultEditor(Object.class, null);
-        for (int i = 0; i < jTable.getColumnCount(); i++) {
-            for (Field field : idFields) {
-                if (jTable.getColumnName(i).equals(field.getName())) {
-//                    TableColumnModel columnModel = jTable.getColumnModel();
-//                    columnModel.getColumn(i).setCellRenderer(new UneditableRenderer());
-                }
-            }
-        }
     }
 
     //Method that checks if we are changing the current table selected 
@@ -496,6 +459,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
     private void botonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelActionPerformed
         // TODO add your handling code here:
+        odb.close();
         PantallaLogIn pli = new PantallaLogIn();
         this.dispose();
         pli.setVisible(true);
@@ -508,21 +472,11 @@ public class PantallaCRUD extends javax.swing.JFrame {
 
         //This code iterates through all of the lists in arrayLists
         for (Map.Entry<Class, List> entry : arrayLists.entrySet()) {
-            EntityManager em = emf.createEntityManager();
-            Class key = entry.getKey();
             List listaActual = entry.getValue();
-
-            //If the object needs to be created or updated, it is merged on
-            //the database and then flushed to execute the update.
             try {
                 for (int i = 0; i < listaActual.size(); i++) {
                     Object appObj = listaActual.get(i);
-                    Object idApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(appObj);
-                    Object objetoDB = em.find(key, idApp);
-                    em.getTransaction().begin();
-                    objetoDB = em.merge(appObj);
-                    em.flush();
-                    em.getTransaction().commit();
+                    odb.store(appObj);
                 }
             } catch (Exception e) {
                 Toolkit.getDefaultToolkit().beep();
@@ -540,17 +494,16 @@ public class PantallaCRUD extends javax.swing.JFrame {
         }
 
         for (Map.Entry<Class, List> entry : inversedArrayLists.entrySet()) {
-            EntityManager em = emf.createEntityManager();
             Class key = entry.getKey();
             List listaActual = entry.getValue();
             List listaClaseDB = extractDBData(key);
             for (Object objectDB : listaClaseDB) {
                 boolean isInList = false;
                 //The code iterate through the database and for each object it get its id
-                Object idObjectDB = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(objectDB);
+                Object idObjectDB = odb.getObjectId(objectDB);
                 for (Object objetoApp : listaActual) {
                     //The code iterate through the arrayList lists and for each object it get its id
-                    Object idObjetoApp = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(objetoApp);
+                    Object idObjetoApp = odb.getObjectId(objetoApp);
                     //This snippet compares both ids, if both are the same, we know the
                     //object from the database is in the last, then it won't be removed
                     //if it is not, that means it was removed
@@ -561,9 +514,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
                 }
                 if (!isInList) {
                     try {
-                        em.getTransaction().begin();
-                        em.remove(em.merge(objectDB));
-                        em.getTransaction().commit();
+                        odb.delete(objectDB);
                     } catch (Exception e) {
                         Toolkit.getDefaultToolkit().beep();
                         JOptionPane.showMessageDialog(null, "Está intentando borrar una columna"
@@ -573,7 +524,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
                     }
                 }
             }
-            em.close();
+            odb.close();
         }
         PantallaCRUD screenCRUD = new PantallaCRUD();
         this.dispose();

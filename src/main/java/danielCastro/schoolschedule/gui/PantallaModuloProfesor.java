@@ -5,23 +5,28 @@
 package danielCastro.schoolschedule.gui;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import danielCastro.schoolschedule.dao.Curso;
+import danielCastro.schoolschedule.dao.Modulo;
+import danielCastro.schoolschedule.dao.Modulo_Profesor;
+import danielCastro.schoolschedule.dao.Profesor;
 import danielCastro.schoolschedule.util.CustomTableHeader;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.swing.table.DefaultTableModel;
+import org.neodatis.odb.ODB;
+import org.neodatis.odb.ODBFactory;
+import org.neodatis.odb.Objects;
+import org.neodatis.odb.core.query.IQuery;
+import org.neodatis.odb.core.query.criteria.Where;
+import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
  *
  * @author Anima
  */
 public class PantallaModuloProfesor extends javax.swing.JDialog {
-    private final EntityManagerFactory emf = Persistence.createEntityManagerFactory("CRM");
+    ODB odb = ODBFactory.open(PantallaLogIn.fileDB.getName(), "root", "");
     DefaultTableModel dtm = new DefaultTableModel();
     /**
      * Creates new form PantallaModuloProfesor
@@ -58,41 +63,37 @@ public class PantallaModuloProfesor extends javax.swing.JDialog {
         //Makes the primary key rows uneditable
         //Sets the images
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\returnArrow.png",
+                ".\\src\\main\\java\\dFanielCastro\\schoolschedule\\img\\returnArrow.png",
                  botonReturn);
     }
     
     private List moduloProfesorDataIntoTable() {
-        //Selects everything for each class and stores it in listaClase.
-        List<Object> listaTabla = new ArrayList();
-        EntityManager em = emf.createEntityManager();
-        String query = """
-                       SELECT
-                       mp.idCurso,
-                       m.nombre,
-                       c.turno,
-                       c.nivel,
-                       m.nombre,
-                       p.nombre
-                       FROM danielCastro.schoolschedule.dao.Modulo_Profesor mp
-                       JOIN danielCastro.schoolschedule.dao.Modulo m
-                       ON mp.idModulo = m.idModulo
-                       JOIN danielCastro.schoolschedule.dao.Profesor p
-                       ON mp.profesor_nif = p.nif
-                       JOIN danielCastro.schoolschedule.dao.Modulo_Curso mc
-                       ON mp.idCurso = mc.idCurso
-                       JOIN danielCastro.schoolschedule.dao.Curso c
-                       ON mc.idCurso = c.idCurso
-                       """;
-        Query tq = em.createQuery(query);
-        try {
-            listaTabla = tq.getResultList();
-        } catch (NoResultException nrex) {
-            System.out.println("No se ha encontrado ningún resultado en la BD.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            em.close();
+        List<Object[]> listaTabla = new ArrayList<>();
+        IQuery query = new CriteriaQuery(Modulo_Profesor.class, Where.and()
+                        .add(Where.not(Where.isNull("idCurso")))
+                        .add(Where.not(Where.isNull("idModulo")))
+                        .add(Where.not(Where.isNull("profesor_nif"))));
+        Objects result = odb.getObjects(query);
+        while (result.hasNext()) {
+            Modulo_Profesor mp = (Modulo_Profesor) result.next();
+            query = new CriteriaQuery(Modulo.class,
+                        Where.equal("idModulo", mp.getIdModulo()));
+            Modulo m = (Modulo) odb.getObjects(query);
+            query = new CriteriaQuery(Profesor.class,
+                        Where.equal("nif", mp.getProfesor_nif()));
+            Profesor p = (Profesor) odb.getObjects(query);
+            query = new CriteriaQuery(Curso.class,
+                        Where.equal("idCurso", mp.getIdCurso()));
+            Curso c = (Curso) odb.getObjects(query);
+            Object[] row = new Object[]{
+                    mp.getIdCurso(),
+                    m.getNombre(),
+                    c.getTurno(),
+                    c.getNivel(),
+                    m.getNombre(),
+                    p.getNombre()
+            };
+            listaTabla.add(row);
         }
         return listaTabla;
     }
@@ -259,17 +260,15 @@ public class PantallaModuloProfesor extends javax.swing.JDialog {
         //</editor-fold>
         FlatLightLaf.setup();
         /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                PantallaModuloProfesor dialog = new PantallaModuloProfesor(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            PantallaModuloProfesor dialog = new PantallaModuloProfesor(new javax.swing.JFrame(), true);
+            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
         });
     }
 
