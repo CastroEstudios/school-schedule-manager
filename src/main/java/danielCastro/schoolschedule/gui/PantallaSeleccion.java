@@ -509,93 +509,68 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                 nombreModulo = modulo[0].toString();
                 idCurso = modulo[1].toString();
 
-                EntityManager em = emf.createEntityManager();
-                String query = """
-                               SELECT 
-                               m.idModulo
-                               FROM danielCastro.schoolschedule.dao.Modulo m
-                               WHERE m.nombre = :nombreModulo
-                               """;
-                Query tq = em.createQuery(query);
-                tq.setParameter("nombreModulo", nombreModulo);
-                int idModulo = 0;
-                try {
-                    idModulo = Integer.parseInt(tq.getSingleResult().toString());
-                    Modulo_Profesor moduloProfesor
-                            = new Modulo_Profesor(nifProfesor, idModulo, idCurso);
-                    emf.createEntityManager();
-                    em.getTransaction().begin();
-                    em.persist(em.merge(moduloProfesor));
-                    em.getTransaction().commit();
-                } catch (NoResultException nrex) {
-                    System.out.println("No se ha encontrado ningún resultado en la BD.");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                } finally {
-                    em.close();
+                IQuery query = new CriteriaQuery(Modulo.class, 
+                        Where.like("nombre", nombreModulo));
+                Objects result = odb.getObjects(query);
+                while (result.hasNext()) {
+                    Modulo resultadoModulo = (Modulo) result;
+                    Modulo_Profesor moduloProfesor = new Modulo_Profesor(nifProfesor, resultadoModulo.getIdModulo(), idCurso);
+                    odb.store(moduloProfesor);
                 }
             }
         }
 
-        EntityManager em = emf.createEntityManager();
-        String query = """
+        String query2 = """
                        SELECT 
                        m.idModulo
                        FROM danielCastro.schoolschedule.dao.Modulo_Profesor m
                        """;
-        Query tq = em.createQuery(query);
-        List<Integer> dbModulosList = null;
-        try {
-            dbModulosList = tq.getResultList();
-        } catch (NoResultException nrex) {
-            System.out.println("No se ha encontrado ningún resultado en la BD.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            em.close();
+        List<Integer> dbModulosList = new ArrayList();
+        IQuery query = new CriteriaQuery(Modulo.class);
+        Objects result = odb.getObjects(query);
+        while (result.hasNext()) {
+            Modulo resultadoModulo = (Modulo) result;
+            dbModulosList.add(resultadoModulo.getIdModulo());
         }
+        
         for (int idModuloDB : dbModulosList) {
             int idModuloTabla = 0;
+            Modulo resultadoModulo = null;
             boolean borrar = true;
             for (Object[] moduloTabla : listaModulosSeleccionados) {
-                em = emf.createEntityManager();
-                query = """
+                query2 = """
                                SELECT 
                                m.idModulo
                                FROM danielCastro.schoolschedule.dao.Modulo m
                                WHERE m.nombre = :nombreModulo
                                """;
-                tq = em.createQuery(query);
-                tq.setParameter("nombreModulo", moduloTabla[0].toString());
-                idModuloTabla = 0;
-                idModuloTabla = Integer.parseInt(tq.getSingleResult().toString());
+                query = new CriteriaQuery(Modulo.class
+                        , Where.equal("nombreModulo"
+                                , moduloTabla[0].toString()));
+                result = odb.getObjects(query);
+                resultadoModulo = (Modulo) result;
+                idModuloTabla = resultadoModulo.getIdModulo();
                 if (idModuloDB == idModuloTabla) {
                     borrar = false;
                     break;
                 }
             }
-            em.close();
-            em = emf.createEntityManager();
+            
             if (borrar) {
                 try {
-                    em.getTransaction().begin();
-                    em.remove(em.merge(em.find(Modulo_Profesor.class, idModuloDB)));
-                    em.getTransaction().commit();
+                    odb.delete(resultadoModulo);
                 } catch (Exception e) {
                     Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(null, "Está intentando borrar una columna"
                             + " referenciado en otra tabla. No se puede realizar esa operación.",
                             "Error de borrado de columna.", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
-                } finally {
-                    em.close();
                 }
             }
-
-        }
         PantallaSeleccion ps = new PantallaSeleccion(nifProfesor);
         this.dispose();
         ps.setVisible(true);
+        }
     }//GEN-LAST:event_botonSaveActionPerformed
 
     private void botonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonDeleteActionPerformed
