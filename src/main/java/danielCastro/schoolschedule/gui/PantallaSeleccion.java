@@ -14,8 +14,12 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.neodatis.odb.ODB;
@@ -123,25 +127,48 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     private List mainData(String str) {
         //Selects everything for each class and stores it in listaClase.
         List<Object> listaTabla = new ArrayList();
-        IQuery query = new CriteriaQuery(Curso.class, Where.equal("turno"
-                , jComboTabla.getSelectedItem().toString()));
+        IQuery query = new CriteriaQuery(Curso.class, Where.equal("turno", str));
         Objects result = odb.getObjects(query);
-        while (result.hasNext()) {
-            Curso cu = (Curso) result.next();
-            query = new CriteriaQuery(Modulo_Curso.class,
-                        Where.equal("idCurso", cu.getIdCurso()));
-            Modulo_Curso mc = (Modulo_Curso) odb.getObjects(query);
-            query = new CriteriaQuery(Modulo.class,
-                        Where.not(Where.equal("idModulo", mc.getIdModulo())));
-            Objects<Modulo> listaModulos = odb.getObjects(query);
-            for (Modulo m : listaModulos) {
-                Object[] row = new Object[]{
-                    m.getNombre(),
-                    cu.getIdCurso(),
-                    cu.getTurno(),
-                    m.getHorasReales()
-                };
-                listaTabla.add(row);
+        Curso cu = (Curso) result.next();
+        
+        query = new CriteriaQuery(Modulo_Profesor.class,
+                    Where.equal("idCurso", cu.getIdCurso()));
+        Objects<Modulo_Profesor> listaMP = odb.getObjects(query);
+        query = new CriteriaQuery(Modulo.class);
+        Objects<Modulo> listaModulos = odb.getObjects(query);
+
+        for (Modulo modulo : listaModulos) {
+            boolean isInMP = false;
+            for (Modulo_Profesor modulo_p : listaMP) {
+                int idModuloModulo = modulo.getIdModulo();
+                int idModuloP = modulo_p.getIdModulo();
+                if(idModuloModulo == idModuloP) {
+                    isInMP = true;
+                }
+            }
+            if (!isInMP) {
+                query = new CriteriaQuery(Modulo_Curso.class, 
+                        Where.equal("idModulo", modulo.getIdModulo()));
+                Objects listaModuloCurso = odb.getObjects(query);
+                if(!listaModuloCurso.isEmpty()) {
+                    Modulo_Curso mc = (Modulo_Curso) listaModuloCurso.getFirst();
+                    query = new CriteriaQuery(Curso.class
+                            , Where.and()
+                            .add(Where.equal("idCurso", mc.getIdCurso()))
+                            .add(Where.equal("turno", str)));
+                    Objects listaCurso = odb.getObjects(query);
+                    for (Object curso : listaCurso) {
+                        Curso cuR = (Curso) curso;
+                        Object[] row = new Object[]{
+                            modulo.getIdModulo(),
+                            modulo.getNombre(),
+                            cuR.getIdCurso(),
+                            cuR.getTurno(),
+                            modulo.getHorasReales()
+                        };
+                        listaTabla.add(row);
+                    }
+                }
             }
         }
         return listaTabla;
@@ -149,21 +176,6 @@ public class PantallaSeleccion extends javax.swing.JFrame {
 
     private List turnTableData() {
         //Selects everything for each class and stores it in listaClase.
-        String query2 = """
-                       SELECT 
-                       m.nombre,
-                       cu.idCurso,
-                       cu.turno,
-                       m.horasReales
-                       FROM danielCastro.schoolschedule.dao.Curso cu
-                       JOIN danielCastro.schoolschedule.dao.Modulo_Curso mc
-                       ON cu.idCurso = mc.idCurso 
-                       JOIN danielCastro.schoolschedule.dao.Modulo m
-                       ON mc.idModulo = m.idModulo
-                       JOIN danielCastro.schoolschedule.dao.Modulo_Profesor mp
-                       ON cu.idCurso = mp.idCurso
-                       WHERE mp.profesor_nif = :nifProfesor
-                       """;
         List<Object> listaTabla = new ArrayList();
         IQuery query = new CriteriaQuery(Modulo_Profesor.class, 
                 Where.equal("profesor_nif", nifProfesor));
@@ -180,6 +192,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                         Where.equal("idModulo", mc.getIdModulo()));
             Modulo m = (Modulo) odb.getObjects(query);
             Object[] row = new Object[]{
+                m.getIdModulo(),
                 m.getNombre(),
                 cu.getIdCurso(),
                 cu.getTurno(),
@@ -196,7 +209,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         dtm.setRowCount(0);
         dtm.setColumnCount(0);
         //Sets the header values depending on the class on the parametres
-        Object[] listaAtt = new Object[]{"Módulo", "Curso", "Turno", "Horas"};
+        Object[] listaAtt = new Object[]{"ID", "Módulo", "Curso", "Turno", "Horas"};
         dtm.setColumnIdentifiers(listaAtt);
         //Sets the table model to DefaultTableModel and gets the list that 
         //has the info of the class and its values.
@@ -224,7 +237,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         ptm.setRowCount(0);
         ptm.setColumnCount(0);
         //Sets the header values depending on the class on the parametres
-        Object[] listaAtt = new Object[]{"Módulo", "Curso", "Turno", "Horas"};
+        Object[] listaAtt = new Object[]{"ID", "Módulo", "Curso", "Turno", "Horas"};
         ptm.setColumnIdentifiers(listaAtt);
         //Sets the table model to DefaultTableModel and gets the list that 
         //has the info of the class and its values.
@@ -424,10 +437,10 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                     .addGroup(jPanelTableLayout.createSequentialGroup()
                         .addGap(67, 67, 67)
                         .addComponent(botonCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 124, Short.MAX_VALUE)
                         .addComponent(botonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(48, 48, 48)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         jPanelTableLayout.setVerticalGroup(
             jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -452,9 +465,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanelMenu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addComponent(jPanelTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 12, Short.MAX_VALUE)))
+                .addComponent(jPanelTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -463,7 +474,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                 .addGap(0, 550, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                    .addGap(0, 84, Short.MAX_VALUE)
+                    .addGap(0, 90, Short.MAX_VALUE)
                     .addComponent(jPanelTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
@@ -503,33 +514,24 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         }
 
         if (!listaModulosSeleccionados.isEmpty()) {
-            String nombreModulo;
-            String idCurso;
             for (Object[] modulo : listaModulosSeleccionados) {
-                nombreModulo = modulo[0].toString();
-                idCurso = modulo[1].toString();
+                int idModulo = Integer.parseInt(modulo[0].toString());
+                String idCurso = modulo[2].toString();
 
                 IQuery query = new CriteriaQuery(Modulo.class, 
-                        Where.like("nombre", nombreModulo));
+                        Where.equal("idModulo", idModulo));
                 Objects result = odb.getObjects(query);
-                while (result.hasNext()) {
-                    Modulo resultadoModulo = (Modulo) result;
-                    Modulo_Profesor moduloProfesor = new Modulo_Profesor(nifProfesor, resultadoModulo.getIdModulo(), idCurso);
-                    odb.store(moduloProfesor);
-                }
+                Modulo resultadoModulo = (Modulo) result.getFirst();
+                Modulo_Profesor moduloProfesor = new Modulo_Profesor(nifProfesor, resultadoModulo.getIdModulo(), idCurso);
+                odb.store(moduloProfesor);
             }
         }
 
-        String query2 = """
-                       SELECT 
-                       m.idModulo
-                       FROM danielCastro.schoolschedule.dao.Modulo_Profesor m
-                       """;
         List<Integer> dbModulosList = new ArrayList();
         IQuery query = new CriteriaQuery(Modulo.class);
         Objects result = odb.getObjects(query);
         while (result.hasNext()) {
-            Modulo resultadoModulo = (Modulo) result;
+            Modulo resultadoModulo = (Modulo) result.next();
             dbModulosList.add(resultadoModulo.getIdModulo());
         }
         
@@ -538,17 +540,11 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             Modulo resultadoModulo = null;
             boolean borrar = true;
             for (Object[] moduloTabla : listaModulosSeleccionados) {
-                query2 = """
-                               SELECT 
-                               m.idModulo
-                               FROM danielCastro.schoolschedule.dao.Modulo m
-                               WHERE m.nombre = :nombreModulo
-                               """;
                 query = new CriteriaQuery(Modulo.class
-                        , Where.equal("nombreModulo"
+                        , Where.equal("idModulo"
                                 , moduloTabla[0].toString()));
                 result = odb.getObjects(query);
-                resultadoModulo = (Modulo) result;
+                resultadoModulo = (Modulo) result.getFirst();
                 idModuloTabla = resultadoModulo.getIdModulo();
                 if (idModuloDB == idModuloTabla) {
                     borrar = false;
@@ -581,7 +577,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             objetoSeleccionado[i] = ptm.getValueAt(selectedIndex, i);
         }
         ptm.removeRow(jTableSelect.getSelectedRow());
-        horasProfesor -= Integer.parseInt(objetoSeleccionado[3].toString());
+        horasProfesor -= Integer.parseInt(objetoSeleccionado[4].toString());
         System.out.println(horasProfesor);
         jLabelHoras.setText("Horas seleccionadas: " + horasProfesor);
     }//GEN-LAST:event_botonDeleteActionPerformed
@@ -593,12 +589,12 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         for (int i = 0; i < jTable.getColumnCount(); i++) {
             objetoSeleccionado[i] = dtm.getValueAt(selectedIndex, i);
         }
-        horasProfesor += Integer.parseInt(objetoSeleccionado[3].toString());
+        horasProfesor += Integer.parseInt(objetoSeleccionado[4].toString());
         if(horasProfesor <= 100) {
             ptm.addRow(objetoSeleccionado);
             jLabelHoras.setText("Horas seleccionadas: " + horasProfesor);
         }else {
-            horasProfesor -= Integer.parseInt(objetoSeleccionado[3].toString());
+            horasProfesor -= Integer.parseInt(objetoSeleccionado[4].toString());
             Toolkit.getDefaultToolkit().beep();
             JOptionPane.showMessageDialog(null, "No se sobreexplote mi rey.",
                     "Error de extenuación.", JOptionPane.ERROR_MESSAGE);
