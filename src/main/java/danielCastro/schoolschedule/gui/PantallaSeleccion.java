@@ -10,7 +10,7 @@ import danielCastro.schoolschedule.dao.Modulo;
 import danielCastro.schoolschedule.dao.Modulo_Curso;
 import danielCastro.schoolschedule.dao.Modulo_Profesor;
 import danielCastro.schoolschedule.dao.Profesor;
-import danielCastro.schoolschedule.util.CustomTableHeader;
+import danielCastro.schoolschedule.util.CustomCellRenderer;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -53,11 +53,11 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     }
 
     private void styles() {
-        //Applies the CustomTableHeader class to the Header and the rest of the table
-        jTable.getTableHeader().setDefaultRenderer(new CustomTableHeader());
-        jTable.setDefaultRenderer(Object.class, new CustomTableHeader());
-        jTableSelect.getTableHeader().setDefaultRenderer(new CustomTableHeader());
-        jTableSelect.setDefaultRenderer(Object.class, new CustomTableHeader());
+        //Applies the CustomCellRenderer class to the Header and the rest of the table
+        jTable.getTableHeader().setDefaultRenderer(new CustomCellRenderer());
+        jTable.setDefaultRenderer(Object.class, new CustomCellRenderer());
+        jTableSelect.getTableHeader().setDefaultRenderer(new CustomCellRenderer());
+        jTableSelect.setDefaultRenderer(Object.class, new CustomCellRenderer());
         jLabelHoras.setText("Horas seleccionadas: " + horasProfesor);
         //Set background colors
         jPanelMenu.setBackground(Color.decode("#dde5b6"));

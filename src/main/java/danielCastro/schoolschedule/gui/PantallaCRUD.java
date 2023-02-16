@@ -8,12 +8,16 @@ import com.formdev.flatlaf.FlatLightLaf;
 import danielCastro.schoolschedule.dao.Ciclo;
 import danielCastro.schoolschedule.dao.Curso;
 import danielCastro.schoolschedule.dao.Especialidad;
+import danielCastro.schoolschedule.dao.FamiliaProfesional;
 import danielCastro.schoolschedule.dao.Login;
 import danielCastro.schoolschedule.dao.Modulo;
 import danielCastro.schoolschedule.dao.Modulo_Curso;
 import danielCastro.schoolschedule.dao.Modulo_Profesor;
 import danielCastro.schoolschedule.dao.Profesor;
-import danielCastro.schoolschedule.util.CustomTableHeader;
+import danielCastro.schoolschedule.util.CustomCellRenderer;
+import danielCastro.schoolschedule.util.CustomHeaderRenderer;
+import danielCastro.schoolschedule.util.LoginHeaderRenderer;
+import danielCastro.schoolschedule.util.LoginTableRenderer;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -37,6 +41,7 @@ import org.neodatis.odb.ODBFactory;
 import org.neodatis.odb.Objects;
 
 public class PantallaCRUD extends javax.swing.JFrame {
+
     ODB odb = ODBFactory.open(PantallaLogIn.fileDB.getName(), "root", "");
     DefaultTableModel dtm = new DefaultTableModel();
     List<Class> listaClases = new ArrayList();
@@ -57,9 +62,12 @@ public class PantallaCRUD extends javax.swing.JFrame {
     }
 
     private void styles() {
-        //Applies the CustomTableHeader class to the Header and the rest of the table
-        jTable.getTableHeader().setDefaultRenderer(new CustomTableHeader());
-        jTable.setDefaultRenderer(Object.class, new CustomTableHeader());
+        //Applies the CustomCellRenderer class to the Header and the rest of the table
+        CustomHeaderRenderer headerRenderer = new CustomHeaderRenderer();
+        CustomCellRenderer cellRenderer = new CustomCellRenderer();
+
+        jTable.getTableHeader().setDefaultRenderer(headerRenderer);
+        jTable.setDefaultRenderer(Object.class, cellRenderer);
         //Set background colors
         jPanelMenu.setBackground(Color.decode("#dde5b6"));
         jPanelTable.setBackground(Color.decode("#dde5b6"));
@@ -67,19 +75,19 @@ public class PantallaCRUD extends javax.swing.JFrame {
         //Sets the images
         PantallaLogIn.initBGImage(
                 ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG4.png",
-                 PantallaLogIn.labelIntoJPanel(jPanel1));
+                PantallaLogIn.labelIntoJPanel(jPanel1));
         PantallaLogIn.initBGImage(
                 ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\saveButton.png",
-                 botonSave);
+                botonSave);
         PantallaLogIn.initBGImage(
                 ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\cancelBoton.png",
-                 botonCancel);
+                botonCancel);
         PantallaLogIn.initBGImage(
                 ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\addBoton.png",
-                 botonCreate);
+                botonCreate);
         PantallaLogIn.initBGImage(
                 ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\deleteBoton.png",
-                 botonDelete);
+                botonDelete);
     }
 
     private Object objectInstance(Class clazz) {
@@ -126,6 +134,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
     }
 
     private void fixedClassesToArrayList() {
+        listaClases.add(0, FamiliaProfesional.class);
         listaClases.add(0, Especialidad.class);
         listaClases.add(1, Profesor.class);
         listaClases.add(2, Modulo.class);
@@ -134,6 +143,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
         listaClases.add(5, Modulo_Curso.class);
         listaClases.add(6, Modulo_Profesor.class);
         listaClases.add(7, Login.class);
+        jComboTabla.addItem("FamiliaProfesional");
         jComboTabla.addItem("Especialidad");
         jComboTabla.addItem("Profesor");
         jComboTabla.addItem("Modulo");
@@ -170,9 +180,8 @@ public class PantallaCRUD extends javax.swing.JFrame {
         //Selects everything for each class and stores it in listaClase.
         List<T> listaClase = new ArrayList();
         Objects<T> result = odb.getObjects(clazz);
-        if (result.hasNext()) {
+        while (result.hasNext()) {
             listaClase.add(result.next());
-            odb.close();
         }
         return listaClase;
     }
@@ -194,6 +203,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
         //Sets the table model to DefaultTableModel and gets the list that 
         //has the info of the class and its values.
         jTable.setModel(dtm);
+        setClassTableRenderer(clazz);
         List listaClase = arrayLists.get(clazz);
         //Iterates over all the values in the list in order to display them
         //on the table
@@ -280,6 +290,15 @@ public class PantallaCRUD extends javax.swing.JFrame {
             }
             // Add the instance Object to the corresponding list in the arrayLists map
             arrayList.add(instance);
+        }
+    }
+
+    private void setClassTableRenderer(Class clazz) {
+        if (clazz.equals(Login.class)) {
+            LoginHeaderRenderer loginHeaderRenderer = new LoginHeaderRenderer();
+            LoginTableRenderer loginTableRenderer = new LoginTableRenderer(jTable); // pass in the JTable instance
+            jTable.getTableHeader().setDefaultRenderer(loginHeaderRenderer);
+            jTable.setDefaultRenderer(Object.class, loginTableRenderer);
         }
     }
 
@@ -475,7 +494,7 @@ public class PantallaCRUD extends javax.swing.JFrame {
             } catch (Exception e) {
                 Toolkit.getDefaultToolkit().beep();
                 JOptionPane.showMessageDialog(null, "Datos incorrectos.",
-                         "Error de inserción", JOptionPane.ERROR_MESSAGE);
+                        "Error de inserción", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         }
@@ -513,13 +532,13 @@ public class PantallaCRUD extends javax.swing.JFrame {
                         Toolkit.getDefaultToolkit().beep();
                         JOptionPane.showMessageDialog(null, "Está intentando borrar una columna"
                                 + " referenciado en otra tabla. No se puede realizar esa operación.",
-                                 "Error de borrado de columna.", JOptionPane.ERROR_MESSAGE);
+                                "Error de borrado de columna.", JOptionPane.ERROR_MESSAGE);
                         e.printStackTrace();
                     }
                 }
             }
-            odb.close();
         }
+        odb.close();
         PantallaCRUD screenCRUD = new PantallaCRUD();
         this.dispose();
         screenCRUD.setVisible(true);

@@ -9,7 +9,7 @@ import danielCastro.schoolschedule.dao.Curso;
 import danielCastro.schoolschedule.dao.Modulo;
 import danielCastro.schoolschedule.dao.Modulo_Profesor;
 import danielCastro.schoolschedule.dao.Profesor;
-import danielCastro.schoolschedule.util.CustomTableHeader;
+import danielCastro.schoolschedule.util.CustomCellRenderer;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +52,9 @@ public class PantallaModuloProfesor extends javax.swing.JDialog {
     }
     
     private void styles() {
-        //Applies the CustomTableHeader class to the Header and the rest of the table
-        jTable.getTableHeader().setDefaultRenderer(new CustomTableHeader());
-        jTable.setDefaultRenderer(Object.class, new CustomTableHeader());
+        //Applies the CustomCellRenderer class to the Header and the rest of the table
+        jTable.getTableHeader().setDefaultRenderer(new CustomCellRenderer());
+        jTable.setDefaultRenderer(Object.class, new CustomCellRenderer());
         //Set background colors
         PantallaLogIn.initBGImage(
                 ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG8.png",

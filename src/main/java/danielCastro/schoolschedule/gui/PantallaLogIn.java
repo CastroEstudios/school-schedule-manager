@@ -8,6 +8,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import danielCastro.schoolschedule.dao.Ciclo;
 import danielCastro.schoolschedule.dao.Curso;
 import danielCastro.schoolschedule.dao.Especialidad;
+import danielCastro.schoolschedule.dao.FamiliaProfesional;
 import danielCastro.schoolschedule.dao.Login;
 import danielCastro.schoolschedule.dao.Modulo;
 import danielCastro.schoolschedule.dao.Modulo_Curso;
@@ -392,9 +393,12 @@ public class PantallaLogIn extends javax.swing.JFrame {
             fileDB.delete();
             odb = ODBFactory.open(PantallaLogIn.fileDB.getName(), "root", "");
             
+            // Insert into FamiliaProfesional
+            odb.store(new FamiliaProfesional(1, "Informática y Comunicaciones"));
+            
             // Insert into Especialidad
-            odb.store(new Especialidad(368, "Informática"));
-            odb.store(new Especialidad(468, "Aplicaciones"));
+            odb.store(new Especialidad(368, 1, "Informática"));
+            odb.store(new Especialidad(468, 1, "Aplicaciones"));
 
             // Insert into Profesor
             odb.store(new Profesor("11111111A", "Wilfredo", "Wilfredo", 1560, 30, 468));
