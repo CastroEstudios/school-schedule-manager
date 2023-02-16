@@ -44,7 +44,7 @@ public class PantallaModuloProfesor extends javax.swing.JDialog {
         dtm.setRowCount(0);
         dtm.setColumnCount(0);
         //Sets the header values depending on the class on the parametres
-        Object[] listaAtt = new Object[]{"Curso", "Id_Modulo", "Descripcion", "Nivel", "Nombre del ciclo", "Nombre"};
+        Object[] listaAtt = new Object[]{"Código", "Módulo", "Curso", "Turno", "Nivel", "Ciclo", "Profesor"};
         dtm.setColumnIdentifiers(listaAtt);
         //Sets the table model to DefaultTableModel and gets the list that 
         //has the info of the class and its values.
@@ -57,40 +57,38 @@ public class PantallaModuloProfesor extends javax.swing.JDialog {
         jTable.setDefaultRenderer(Object.class, new CustomTableHeader());
         //Set background colors
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG17.png",
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\BG8.png",
                  PantallaLogIn.labelIntoJPanel(jPanelMenu));
         jPanelMenu.setBackground(Color.decode("#dde5b6"));
         //Makes the primary key rows uneditable
         //Sets the images
         PantallaLogIn.initBGImage(
-                ".\\src\\main\\java\\dFanielCastro\\schoolschedule\\img\\returnArrow.png",
+                ".\\src\\main\\java\\danielCastro\\schoolschedule\\img\\returnArrow.png",
                  botonReturn);
     }
     
     private List moduloProfesorDataIntoTable() {
         List<Object[]> listaTabla = new ArrayList<>();
-        IQuery query = new CriteriaQuery(Modulo_Profesor.class, Where.and()
-                        .add(Where.not(Where.isNull("idCurso")))
-                        .add(Where.not(Where.isNull("idModulo")))
-                        .add(Where.not(Where.isNull("profesor_nif"))));
+        IQuery query = new CriteriaQuery(Modulo_Profesor.class);
         Objects result = odb.getObjects(query);
         while (result.hasNext()) {
             Modulo_Profesor mp = (Modulo_Profesor) result.next();
             query = new CriteriaQuery(Modulo.class,
                         Where.equal("idModulo", mp.getIdModulo()));
-            Modulo m = (Modulo) odb.getObjects(query);
+            Modulo m = (Modulo) odb.getObjects(query).getFirst();
             query = new CriteriaQuery(Profesor.class,
                         Where.equal("nif", mp.getProfesor_nif()));
-            Profesor p = (Profesor) odb.getObjects(query);
+            Profesor p = (Profesor) odb.getObjects(query).getFirst();
             query = new CriteriaQuery(Curso.class,
                         Where.equal("idCurso", mp.getIdCurso()));
-            Curso c = (Curso) odb.getObjects(query);
+            Curso c = (Curso) odb.getObjects(query).getFirst();
             Object[] row = new Object[]{
-                    mp.getIdCurso(),
                     m.getNombre(),
+                    m.getDescripcion(),
+                    mp.getIdCurso(),
                     c.getTurno(),
                     c.getNivel(),
-                    m.getNombre(),
+                    c.getIdCiclo(),
                     p.getNombre()
             };
             listaTabla.add(row);

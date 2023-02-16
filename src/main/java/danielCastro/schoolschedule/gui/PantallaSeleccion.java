@@ -9,17 +9,14 @@ import danielCastro.schoolschedule.dao.Curso;
 import danielCastro.schoolschedule.dao.Modulo;
 import danielCastro.schoolschedule.dao.Modulo_Curso;
 import danielCastro.schoolschedule.dao.Modulo_Profesor;
+import danielCastro.schoolschedule.dao.Profesor;
 import danielCastro.schoolschedule.util.CustomTableHeader;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.neodatis.odb.ODB;
@@ -40,14 +37,10 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     List<String> listaTurnos = new ArrayList();
     LinkedHashMap<String, List> arrayLists = new LinkedHashMap<>();
     List listaCamposTablaSelect = new ArrayList();
+    List<Object[]> listaModulosProfesorABorrar = new ArrayList();
     int horasProfesor = 0;
     static String nifProfesor;
 
-    /**
-     * Creates new form PantallaPrincipal
-     *
-     * @param nif
-     */
     public PantallaSeleccion(String nif) {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -125,46 +118,34 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     //Method that extracts all the info of the database and stores it into its
     //corresponding list.
     private List mainData(String str) {
-        //Selects everything for each class and stores it in listaClase.
         List<Object> listaTabla = new ArrayList();
         IQuery query = new CriteriaQuery(Curso.class, Where.equal("turno", str));
         Objects result = odb.getObjects(query);
-        Curso cu = (Curso) result.next();
-        
-        query = new CriteriaQuery(Modulo_Profesor.class,
+        while (result.hasNext()) {
+            Curso cu = (Curso) result.next();
+            query = new CriteriaQuery(Modulo_Curso.class, 
                     Where.equal("idCurso", cu.getIdCurso()));
-        Objects<Modulo_Profesor> listaMP = odb.getObjects(query);
-        query = new CriteriaQuery(Modulo.class);
-        Objects<Modulo> listaModulos = odb.getObjects(query);
+            Objects listaModuloCurso = odb.getObjects(query);
 
-        for (Modulo modulo : listaModulos) {
-            boolean isInMP = false;
-            for (Modulo_Profesor modulo_p : listaMP) {
-                int idModuloModulo = modulo.getIdModulo();
-                int idModuloP = modulo_p.getIdModulo();
-                if(idModuloModulo == idModuloP) {
-                    isInMP = true;
-                }
-            }
-            if (!isInMP) {
-                query = new CriteriaQuery(Modulo_Curso.class, 
-                        Where.equal("idModulo", modulo.getIdModulo()));
-                Objects listaModuloCurso = odb.getObjects(query);
-                if(!listaModuloCurso.isEmpty()) {
-                    Modulo_Curso mc = (Modulo_Curso) listaModuloCurso.getFirst();
-                    query = new CriteriaQuery(Curso.class
-                            , Where.and()
-                            .add(Where.equal("idCurso", mc.getIdCurso()))
-                            .add(Where.equal("turno", str)));
-                    Objects listaCurso = odb.getObjects(query);
-                    for (Object curso : listaCurso) {
-                        Curso cuR = (Curso) curso;
+            for (Object objectModuloCurso : listaModuloCurso) {
+                Modulo_Curso mc = (Modulo_Curso) objectModuloCurso;
+                query = new CriteriaQuery(Modulo_Profesor.class, 
+                    Where.and()
+                        .add(Where.equal("idModulo", mc.getIdModulo()))
+                        .add(Where.equal("idCurso", mc.getIdCurso())));
+                Objects moduloProfesor = odb.getObjects(query);
+                if(moduloProfesor.isEmpty()) {
+                    query = new CriteriaQuery(Modulo.class
+                        , Where.equal("idModulo", mc.getIdModulo()));
+                    Objects listaModuloObject = odb.getObjects(query);
+                    for (Object m : listaModuloObject) {
+                        Modulo moD = (Modulo) m;
                         Object[] row = new Object[]{
-                            modulo.getIdModulo(),
-                            modulo.getNombre(),
-                            cuR.getIdCurso(),
-                            cuR.getTurno(),
-                            modulo.getHorasReales()
+                            mc.getIdModulo(),
+                            moD.getNombre(),
+                            mc.getIdCurso(),
+                            cu.getTurno(),
+                            moD.getHorasReales()
                         };
                         listaTabla.add(row);
                     }
@@ -175,7 +156,6 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     }
 
     private List turnTableData() {
-        //Selects everything for each class and stores it in listaClase.
         List<Object> listaTabla = new ArrayList();
         IQuery query = new CriteriaQuery(Modulo_Profesor.class, 
                 Where.equal("profesor_nif", nifProfesor));
@@ -184,17 +164,17 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             Modulo_Profesor mp = (Modulo_Profesor) result.next();
             query = new CriteriaQuery(Curso.class,
                         Where.equal("idCurso", mp.getIdCurso()));
-            Curso cu = (Curso) odb.getObjects(query);
-            query = new CriteriaQuery(Modulo_Profesor.class,
+            Curso cu = (Curso) odb.getObjects(query).getFirst();
+            query = new CriteriaQuery(Modulo_Curso.class,
                         Where.equal("idCurso", cu.getIdCurso()));
-            Modulo_Curso mc = (Modulo_Curso) odb.getObjects(query);
+            Modulo_Curso mc = (Modulo_Curso) odb.getObjects(query).getFirst();
             query = new CriteriaQuery(Modulo.class,
                         Where.equal("idModulo", mc.getIdModulo()));
-            Modulo m = (Modulo) odb.getObjects(query);
+            Modulo m = (Modulo) odb.getObjects(query).getFirst();
             Object[] row = new Object[]{
-                m.getIdModulo(),
+                mc.getIdModulo(),
                 m.getNombre(),
-                cu.getIdCurso(),
+                mc.getIdCurso(),
                 cu.getTurno(),
                 m.getHorasReales()
             };
@@ -292,7 +272,6 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         botonCancel = new javax.swing.JButton();
         botonSave = new javax.swing.JButton();
         jComboTabla = new javax.swing.JComboBox<>();
-        jTextField1 = new javax.swing.JTextField();
         botonModuloProfesor = new javax.swing.JButton();
         jPanelTable = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -323,8 +302,6 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             }
         });
 
-        jTextField1.setToolTipText("Filtrar");
-
         botonModuloProfesor.setBorderPainted(false);
         botonModuloProfesor.setContentAreaFilled(false);
         botonModuloProfesor.addActionListener(new java.awt.event.ActionListener() {
@@ -342,9 +319,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                 .addComponent(botonSave, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(47, 47, 47)
                 .addComponent(jComboTabla, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(40, 40, 40)
+                .addGap(287, 287, 287)
                 .addComponent(botonModuloProfesor, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 280, Short.MAX_VALUE)
                 .addComponent(botonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -356,11 +331,9 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                 .addGap(10, 10, 10)
                 .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboTabla))
-                        .addGap(24, 24, 24))
+                        .addGap(28, 28, 28)
+                        .addComponent(jComboTabla)
+                        .addGap(28, 28, 28))
                     .addComponent(botonModuloProfesor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -495,7 +468,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     private void botonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCancelActionPerformed
         // TODO add your handling code here:
         //Cambios en BD
-
+        odb.close();
         PantallaLogIn plog = new PantallaLogIn();
         this.dispose();
         plog.setVisible(true);
@@ -526,35 +499,14 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                 odb.store(moduloProfesor);
             }
         }
-
-        List<Integer> dbModulosList = new ArrayList();
-        IQuery query = new CriteriaQuery(Modulo.class);
-        Objects result = odb.getObjects(query);
-        while (result.hasNext()) {
-            Modulo resultadoModulo = (Modulo) result.next();
-            dbModulosList.add(resultadoModulo.getIdModulo());
-        }
         
-        for (int idModuloDB : dbModulosList) {
-            int idModuloTabla = 0;
-            Modulo resultadoModulo = null;
-            boolean borrar = true;
-            for (Object[] moduloTabla : listaModulosSeleccionados) {
-                query = new CriteriaQuery(Modulo.class
-                        , Where.equal("idModulo"
-                                , moduloTabla[0].toString()));
-                result = odb.getObjects(query);
-                resultadoModulo = (Modulo) result.getFirst();
-                idModuloTabla = resultadoModulo.getIdModulo();
-                if (idModuloDB == idModuloTabla) {
-                    borrar = false;
-                    break;
-                }
-            }
-            
-            if (borrar) {
+        for (Object[] moduloProfesorTabla : listaModulosProfesorABorrar) {
+            IQuery query = new CriteriaQuery(Modulo_Profesor.class
+                    , Where.equal("idModulo", Integer.parseInt(moduloProfesorTabla[0].toString())));
+            Modulo_Profesor queryResult = (Modulo_Profesor) odb.getObjects(query).getFirst();
+            if(queryResult != null) {
                 try {
-                    odb.delete(resultadoModulo);
+                    odb.delete(queryResult);
                 } catch (Exception e) {
                     Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(null, "Está intentando borrar una columna"
@@ -562,11 +514,13 @@ public class PantallaSeleccion extends javax.swing.JFrame {
                             "Error de borrado de columna.", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 }
+                break;
             }
+        }
+        odb.close();
         PantallaSeleccion ps = new PantallaSeleccion(nifProfesor);
         this.dispose();
         ps.setVisible(true);
-        }
     }//GEN-LAST:event_botonSaveActionPerformed
 
     private void botonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonDeleteActionPerformed
@@ -576,6 +530,7 @@ public class PantallaSeleccion extends javax.swing.JFrame {
         for (int i = 0; i < jTableSelect.getColumnCount(); i++) {
             objetoSeleccionado[i] = ptm.getValueAt(selectedIndex, i);
         }
+        listaModulosProfesorABorrar.add(objetoSeleccionado);
         ptm.removeRow(jTableSelect.getSelectedRow());
         horasProfesor -= Integer.parseInt(objetoSeleccionado[4].toString());
         System.out.println(horasProfesor);
@@ -590,19 +545,24 @@ public class PantallaSeleccion extends javax.swing.JFrame {
             objetoSeleccionado[i] = dtm.getValueAt(selectedIndex, i);
         }
         horasProfesor += Integer.parseInt(objetoSeleccionado[4].toString());
-        if(horasProfesor <= 100) {
+        
+        IQuery query = new CriteriaQuery(Profesor.class, 
+                        Where.equal("nif", nifProfesor));
+        Profesor result = (Profesor) odb.getObjects(query).getFirst();
+        if(horasProfesor <= result.getHorasContratadas()) {
             ptm.addRow(objetoSeleccionado);
             jLabelHoras.setText("Horas seleccionadas: " + horasProfesor);
         }else {
             horasProfesor -= Integer.parseInt(objetoSeleccionado[4].toString());
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "No se sobreexplote mi rey.",
-                    "Error de extenuación.", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Ha sobrepasado sus horas contratadas.",
+                    "Error de horario.", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_botonCreateActionPerformed
 
     private void botonModuloProfesorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonModuloProfesorActionPerformed
         // TODO add your handling code here:
+        odb.close();
         PantallaModuloProfesor pmp = new PantallaModuloProfesor(this, true);
         this.setVisible(false);
         pmp.setVisible(true);
@@ -657,6 +617,5 @@ public class PantallaSeleccion extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable;
     private javax.swing.JTable jTableSelect;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

@@ -388,7 +388,9 @@ public class PantallaLogIn extends javax.swing.JFrame {
         // TODO add your handling code here:
         if(fileDB.exists()) {
             
+            odb.close();
             fileDB.delete();
+            odb = ODBFactory.open(PantallaLogIn.fileDB.getName(), "root", "");
             
             // Insert into Especialidad
             odb.store(new Especialidad(368, "Informática"));
@@ -518,7 +520,6 @@ public class PantallaLogIn extends javax.swing.JFrame {
             odb.store(new Ciclo(21, "1º TÉCNICO SUPERIOR ANIMACIONES 3D, JUEGOS Y ENTORNOS INTERACTIVOS LOE", "Superior", 368));
 
             //Insert curso
-            odb.store(new Curso("671NTB", "Tarde", 1, 6));
             odb.store(new Curso("671NTB", "Tarde", 1, 6));
             odb.store(new Curso("672NTA", "Tarde", 2, 13));
             odb.store(new Curso("671NTA", "Tarde", 1, 6));
